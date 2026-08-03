@@ -1,0 +1,13 @@
+{
+  "name": "ia-helpers",
+  "private": true,
+  "scripts": {
+    "lint:md": "markdownlint-cli2 \"**/*.md\"",
+    "lint:md:fix": "markdownlint-cli2 --fix \"**/*.md\"",
+    "prepare": "lefthook install"
+  },
+  "devDependencies": {
+    "lefthook": "^2.1.10",
+    "markdownlint-cli2": "^0.23.2"
+  }
+}

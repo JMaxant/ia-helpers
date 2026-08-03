@@ -29,6 +29,11 @@ The `.md` agents and the matching skills carry the same content: pick whichever 
 ### Root files
 
 - `.editorconfig` — Shared editor settings (UTF-8, LF, 2-space indent, trailing whitespace preserved in Markdown to keep hard breaks).
+- `.markdownlint-cli2.jsonc` — Markdown lint rules (see Development below).
+- `lefthook.yml` — Git hooks config (pre-commit Markdown lint).
+- `Taskfile.dist.yml` — Template for local dev commands (see Development below).
+- `package.json` — npm scripts and dev dependencies backing the Taskfile and CI.
+- `.github/workflows/markdown-lint.yml` — CI job running the Markdown lint on push to `main` and on pull requests.
 - `LICENSE` — MIT.
 
 ## Usage
@@ -58,12 +63,35 @@ When the agent runs inside a container or a sandbox (Docker, DDEV, a devcontaine
 
 Whichever option applies, check where the agent actually looks for its skills and agents inside the container, since the configuration directory may differ from the host one.
 
+## Development
+
+Requires Node.js and, optionally, [Task](https://taskfile.dev) (`task`) to run the commands below without typing the underlying `npm`/`npx` calls.
+
+Setup (once per clone): copy the Taskfile template, then run the setup task.
+
+```bash
+cp Taskfile.dist.yml Taskfile.yml   # git-ignored, safe to customize locally
+task setup                          # npm install + registers the pre-commit git hook
+```
+
+Without `task`, the same setup is `npm install` (its `prepare` script registers the git hook).
+
+Available tasks (`task --list`, or run the underlying npm script directly):
+
+| Task | npm script equivalent | What it does |
+| --- | --- | --- |
+| `task qa` | `npm run lint:md` | Runs every quality check on all files — what CI runs. |
+| `task qa:fix` | `npm run lint:md:fix` | Auto-fixes what can be (currently Markdown lint issues). |
+
+The pre-commit hook (via `lefthook.yml`) runs the same Markdown lint on staged `*.md` files only, so most issues are caught before they ever reach CI.
+
 ## Contributing
 
 - Follow `.editorconfig`.
 - One directory per skill, containing a `SKILL.md` with a `description` explicit enough for an agent to decide on its own when to trigger the skill.
 - Keep supporting material in `templates/` (content to fill in) and `references/` (documentation loaded on demand) so the main `SKILL.md` stays short.
 - When a skill and an agent cover the same subject, keep both in sync.
+- Run `task qa` (or `npm run lint:md`) before committing; the pre-commit hook already checks staged Markdown files, `task qa` covers everything.
 
 ## License
 

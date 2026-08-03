@@ -73,7 +73,6 @@ To add a new stack: create `references/<stack>.md` following the existing files 
 - Is GDPR compliance respected?
 - Is sensitive data (API keys, `client_secret`, user information) encrypted?
 
-
 ---
 
 ## 4. Review Report Template

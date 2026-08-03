@@ -1,0 +1,23 @@
+{
+  // Rule config: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+  "config": {
+    "default": true,
+    // Templates/tables intentionally exceed 80 chars; not worth enforcing.
+    "MD013": false,
+    // Reference files embed raw HTML-ish placeholders (<...>) in code fences,
+    // not actual inline HTML, but keep the rule off to avoid false positives.
+    "MD033": false,
+    // Headings like "### 5.1 Generals" repeat across independent reference
+    // files; only flag true duplicates within the same file (default behavior).
+    "MD024": { "siblings_only": true },
+    // This repo's established style is dense: no blank line required around
+    // headings/lists/fences, and skill/agent files lead with frontmatter plus
+    // an intro paragraph before the first heading. Matching the convention
+    // already in use rather than rewriting every existing file.
+    "MD022": false,
+    "MD032": false,
+    "MD031": false,
+    "MD041": false
+  },
+  "ignores": ["node_modules"]
+}
