@@ -1,0 +1,5 @@
+# ~/.vibe/agents/custom.toml
+display_name = "Documentation"
+description = "Agent that uses documentation skill"
+safety = "safe"
+skills = ['documentation']
