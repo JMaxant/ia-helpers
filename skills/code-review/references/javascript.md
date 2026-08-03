@@ -8,3 +8,18 @@
 - Avoid side effects in pure functions.
 - Type with JSDoc or TypeScript where applicable.
 - Handle errors with appropriate try/catch or Promises.
+
+## Vue.js 3
+
+**Detection triggers**: `vue` dependency at major version 3 in `package.json` (or `@vitejs/plugin-vue`/`vue-loader` present), and/or `.vue` files in the diff. Version read from the `vue` dependency constraint.
+
+- Prefer the Composition API with `<script setup>` over the Options API for new components.
+- Type props and emits with `defineProps`/`defineEmits` (generics if TypeScript); avoid mutating props directly — emit an event or use a local `ref`/`computed` instead.
+- Use `computed` for derived state rather than recomputing it in methods or the template.
+- Prefer `ref` for primitives and `reactive` for object-shaped local state; avoid mixing both for the same piece of state.
+- Component names: multi-word, PascalCase, to avoid clashing with current and future HTML elements (Vue style guide rule).
+- Always provide a `:key` with `v-for`; never combine `v-if` and `v-for` on the same element.
+- Scope component styles (`<style scoped>` or CSS modules) to avoid leaking rules globally.
+- Extract reusable reactive logic into composables (`useXxx` functions) rather than duplicating it across components or relying on mixins.
+- For shared/global state, prefer Pinia over Vuex on new code.
+- Two-way binding on a single prop: use `defineModel` (Vue 3.4+) rather than manually wiring `modelValue`/`update:modelValue` when the target version supports it.

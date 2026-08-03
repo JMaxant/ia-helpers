@@ -1,0 +1,6 @@
+# Stub: add/remove files to ignore depending on your project and task.
+# Copy/paste this file to .aiignore and edit it.
+.env
+.env.local
+web/sites/default/settings.php
+web/sites/default/settings.local.php

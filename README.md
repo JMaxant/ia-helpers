@@ -14,7 +14,7 @@ Agent skills, one directory per skill. Each skill is a `SKILL.md` with YAML fron
   - `templates/` — Task templates: `feature.md`, `bug.md`, `design.md`, `chore.md`.
   - `references/trackers.md` — Tracker-specific reference (GitHub, GitLab, Redmine).
 - `code-review/` — Code review focused on quality, security, and maintainability. Defines the universal review criteria (readability, design, security) and a structured report template written to `CODE_REVIEW.md`. Stack detection is dynamic: marker files (`composer.json`, `package.json`, ...) are used to infer the stack and version, confirmed interactively with the user (`AskUserQuestion`) before applying stack-specific conventions.
-  - `references/` — Stack-specific conventions, one file per stack, loaded only when detected: `php-drupal.md`, `javascript.md`. Add a new stack by dropping another file here (detection markers documented at the top of each file) without touching `SKILL.md`.
+  - `references/` — Stack-specific conventions, one file per stack, loaded only when detected: `php-drupal.md`, `javascript.md` (includes Vue.js 3), `python.md`, `golang.md`. Add a new stack by dropping another file here (detection markers documented at the top of each file) without touching `SKILL.md`.
 - `documentation/` — Writing and updating project documentation. Defines the frontmatter standard, general writing rules (structure, style, accessibility, no emoji), and templates for a general README, a technical/functional document, and a changelog. The writing language is not assumed: it's inferred from explicit user instructions or existing project conventions, and asked interactively (`AskUserQuestion`) otherwise.
 
 ### `agents/`
