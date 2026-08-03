@@ -1,32 +1,32 @@
-# Template : bug
+# Template: bug
 
-Titre : symptôme observé, pas la solution — ex. « Le menu veille disparaît en viewport mobile »
+Title: observed symptom, not the fix — e.g. "The idle menu disappears on mobile viewport"
 
 ```markdown
-## Comportement observé
+## Observed behavior
 
-<Ce qui se passe. Inclure le message d'erreur exact si applicable.>
+<What happens. Include the exact error message if applicable.>
 
-## Comportement attendu
+## Expected behavior
 
-<Ce qui devrait se passer.>
+<What should happen.>
 
 ## Reproduction
 
-1. <étape 1>
-2. <étape 2>
-3. <résultat>
+1. <step 1>
+2. <step 2>
+3. <result>
 
-## Environnement
+## Environment
 
-- Version / commit : <sha ou tag>
-- OS / navigateur / outil : <si pertinent>
+- Version / commit: <sha or tag>
+- OS / browser / tool: <if relevant>
 
-## Piste ou analyse (optionnel)
+## Lead or analysis (optional)
 
-<Cause suspectée, fichiers concernés, sans imposer la solution.>
+<Suspected cause, affected files, without dictating the fix.>
 
-## Definition of done (optionnel)
+## Definition of done (optional)
 
-- [ ] <exigence de qualité : test de non-régression ajouté, doc à jour...>
+- [ ] <quality requirement: regression test added, docs updated...>
 ```

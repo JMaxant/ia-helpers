@@ -1,4 +1,4 @@
 display_name = "Code Reviewer"
-description = "Agent expert en revue de code, focalisé sur la qualité, la sécurité et la maintenabilité."
+description = "Expert code review agent, focused on quality, security, and maintainability."
 safety = "safe"
 skills = ['code-review']

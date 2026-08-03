@@ -1,35 +1,35 @@
-# Template : feature / évolution
+# Template: feature / evolution
 
-Titre : `<verbe impératif> <objet>` — ex. « Ajouter le flux RSS de la section veille »
+Title: `<imperative verb> <object>` — e.g. "Add the RSS feed for the watch section"
 
 ```markdown
-## Contexte
+## Context
 
-<Pourquoi cette évolution ? Quel besoin utilisateur ou technique ? 2-4 phrases.>
+<Why this evolution? What user or technical need? 2-4 sentences.>
 
-## Objectif
+## Objective
 
-<Résultat attendu, formulé du point de vue de l'utilisateur ou du système. 1-2 phrases.>
+<Expected outcome, phrased from the user's or system's point of view. 1-2 sentences.>
 
-## Critères d'acceptation
+## Acceptance criteria
 
-- [ ] <critère vérifiable 1>
-- [ ] <critère vérifiable 2>
+- [ ] <verifiable criterion 1>
+- [ ] <verifiable criterion 2>
 
-## Tâches
+## Tasks
 
-- [ ] <étape de réalisation 1>
-- [ ] <étape de réalisation 2>
+- [ ] <implementation step 1>
+- [ ] <implementation step 2>
 
 ## Definition of done
 
-- [ ] <exigence de qualité : tests passants, doc à jour, revue faite, build OK...>
+- [ ] <quality requirement: passing tests, docs updated, review done, build OK...>
 
-## Hors périmètre (optionnel)
+## Out of scope (optional)
 
-<Ce qui est explicitement exclu, pour éviter la dérive.>
+<What is explicitly excluded, to avoid scope creep.>
 
-## Références (optionnel)
+## References (optional)
 
-<Liens : issues liées, doc, maquettes.>
+<Links: related issues, docs, mockups.>
 ```

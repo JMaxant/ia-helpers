@@ -1,84 +1,90 @@
 ---
 name: new-task
-description: Créer une tâche (GitHub Issue, GitLab Issue ou ticket Redmine) à partir de templates prédéfinis (feature, bug, conception, chore), avec validation avant création. Utiliser dès que l'utilisateur veut créer/rédiger une issue, un ticket ou une tâche de gestion de projet.
+description: Create a task (GitHub Issue, GitLab Issue, or Redmine ticket) from predefined templates (feature, bug, design, chore), with validation before creation. Use as soon as the user wants to create/draft an issue, a ticket, or a project-management task.
 ---
 
-# new-task — création de tâches templatisées
+# new-task — templated task creation
 
-Rédige une tâche selon un template, la fait valider, puis la crée dans le tracker du projet.
+Draft a task from a template, get it validated, then create it in the project's tracker. A single request can cover several tasks at once (e.g. "create a ticket for each of these 3 bugs"): in that case, draft the whole batch and get it validated as a block (see Step 4), rather than task by task.
 
-## Étape 0 — Initialiser la configuration (si absente)
+## Step 0 — Initialize the configuration (if missing)
 
-Si `.claude/task-tracker.toml` n'existe pas à la racine du repo, ou si l'utilisateur demande explicitement l'initialisation, proposer de le créer en le questionnant (AskUserQuestion) :
+If `.claude/task-tracker.toml` doesn't exist at the repo root, or if the user explicitly asks for initialization, offer to create it by asking (AskUserQuestion):
 
-1. **Tracker** : github | gitlab | redmine (pré-sélectionner celui inféré depuis `git remote get-url origin` s'il y en a un).
-2. **Défauts** : labels par défaut, milestone par défaut (proposer les valeurs existantes du projet : `gh label list`, milestones ouvertes...).
-3. **Si Redmine** : URL de l'instance, `project_id`, méthode de création (csv | mcp | rest — voir `references/trackers.md`), et le mapping `tracker_ids` (demander les IDs ou les récupérer via l'API si une clé est déjà disponible).
+1. **Tracker**: github | gitlab | redmine (pre-select the one inferred from `git remote get-url origin` if there is one).
+2. **Defaults**: default labels, default milestone (suggest the project's existing values: `gh label list`, open milestones...).
+3. **If Redmine**: instance URL, `project_id`, creation method (csv | mcp | rest — see `references/trackers.md`), and the `tracker_ids` mapping (ask for the IDs or fetch them via the API if a key is already available).
 
-Écrire le fichier, le montrer à l'utilisateur, puis continuer avec la tâche demandée. Si l'utilisateur décline, continuer sans config (inférence + questions ponctuelles) sans re-proposer dans la session.
+Write the file, show it to the user, then continue with the requested task. If the user declines, continue without config (inference + one-off questions) without re-offering it during the session.
 
-## Étape 1 — Identifier le tracker
+## Step 1 — Identify the tracker
 
-1. Lire `.claude/task-tracker.toml` à la racine du repo s'il existe (format ci-dessous).
-2. Sinon, inférer depuis `git remote get-url origin` : `github.com` → GitHub, `gitlab` → GitLab.
-3. Si ambigu ou hors repo git, demander à l'utilisateur (AskUserQuestion).
+1. Read `.claude/task-tracker.toml` at the repo root if it exists (format below).
+2. Otherwise, infer from `git remote get-url origin`: `github.com` → GitHub, `gitlab` → GitLab.
+3. If ambiguous or outside a git repo, ask the user (AskUserQuestion).
 
-Format de `.claude/task-tracker.toml` :
+Format of `.claude/task-tracker.toml`:
 
 ```toml
 tracker = "github"          # github | gitlab | redmine
 
 [defaults]
-labels = []                  # labels/étiquettes appliqués par défaut
-milestone = ""               # milestone par défaut (optionnel)
+labels = []                  # default labels/tags applied
+milestone = ""               # default milestone (optional)
 
 [redmine]
 url = "https://redmine.example.com"
-project_id = "mon-projet"
-method = "csv"               # csv (défaut, import manuel) | mcp | rest
+project_id = "my-project"
+method = "csv"               # csv (default, manual import) | mcp | rest
 tracker_ids = { feature = 2, bug = 1, design = 2, chore = 2 }
-# Clé API (méthode rest) : variable d'environnement REDMINE_API_KEY, jamais dans ce fichier.
+# API key (rest method): environment variable REDMINE_API_KEY, never in this file.
 ```
 
-## Étape 2 — Choisir le template
+## Step 2 — Choose the template
 
-Types disponibles (fichiers dans `templates/`) :
+Available types (files in `templates/`):
 
-- `feature.md` — évolution, nouvelle fonctionnalité
-- `bug.md` — anomalie
-- `design.md` — tâche de conception (ADR, étude, maquette)
-- `chore.md` — maintenance, dépendances, doc, CI
+- `feature.md` — evolution, new feature
+- `bug.md` — defect
+- `design.md` — design task (ADR, study, mockup)
+- `chore.md` — maintenance, dependencies, docs, CI
 
-Déduire le type depuis la demande ; demander seulement si vraiment ambigu.
+Infer the type from the request; ask only if genuinely ambiguous.
 
-## Étape 3 — Rédiger
+## Step 3 — Draft
 
-Remplir le template avec les informations fournies et le contexte du repo. Contraintes de rédaction :
+Fill in the template with the information provided and the repo's context. Drafting constraints:
 
-- Titre : impératif, ≤ 70 caractères, sans ponctuation finale. Pour un bug, décrire le symptôme, pas la solution.
-- Ne jamais laisser un placeholder `<...>` dans le résultat : demander l'information manquante ou supprimer la section si elle est marquée optionnelle.
-- Critères d'acceptation : vérifiables, un par ligne, cases à cocher.
-- Pas d'emoji. Concision.
-- Respecter les conventions du projet si documentées (CLAUDE.md, CONTRIBUTING) : préfixes de titre, labels obligatoires, liens vers milestone.
+- Title: imperative mood, ≤ 70 characters, no trailing punctuation. For a bug, describe the symptom, not the fix.
+- Never leave a `<...>` placeholder in the result: ask for the missing information or remove the section if it's marked optional.
+- Acceptance criteria: verifiable, one per line, checkboxes.
+- No emoji. Be concise.
+- Follow the project's conventions if documented (CLAUDE.md, CONTRIBUTING): title prefixes, required labels, links to a milestone.
 
-## Étape 4 — Valider
+## Step 4 — Validate
 
-Toujours montrer le brouillon complet (titre, corps, labels, milestone, assigné) à l'utilisateur et attendre son accord explicite avant toute création. Poser la validation via AskUserQuestion en plaçant le brouillon complet dans le champ `preview` de l'option de création — du texte affiché avant l'appel d'outil peut ne pas être visible de l'utilisateur. Prévoir une option « Corriger d'abord ». Appliquer ses corrections et re-présenter si les changements sont substantiels.
+Always show the full draft (title, body, labels, milestone, assignee) to the user and wait for their explicit approval before any creation.
 
-## Étape 5 — Créer
+**Single task**: display the full draft as plain response text (never truncated, unlike the `preview` field), then ask the create/fix decision via AskUserQuestion with a short summary in `preview` (title + labels/milestone, not the whole body) and a "Fix first" option. Apply the corrections and re-present if the changes are substantial.
 
-Commandes détaillées par tracker : voir `references/trackers.md`. Résumé :
+**Multiple tasks (batch)**: do not re-display each draft in full in the conversation. Draft the whole batch into a single file (format below), present a compact summary table in the conversation (subject, tracker, labels, milestone, parent if applicable) pointing to that file for the full body, then validate the batch as a block via a single AskUserQuestion ("Create the batch" / "Fix first"). Expand a specific draft in full only if the user asks for it.
 
-- **GitHub** : `gh issue create` (prérequis : `gh` authentifié).
-- **GitLab** : `glab issue create` si installé, sinon API REST avec `GITLAB_TOKEN`.
-- **Redmine** : selon `method` de la config — par défaut génération d'un CSV pour import manuel en masse (le plus simple, aucune authentification requise) ; sinon serveur MCP Redmine si disponible dans la session, ou API REST avec `REDMINE_API_KEY`.
+**Batch draft file**: write the batch to a markdown file at the root of the current directory (not a scratchpad directory — a non-technical project manager wouldn't know where to look), named `tasks-YYYY-MM-DD-HH-mm.md` (generation date and time, 24h, hyphens as separators — the `H:i` format becomes `HH-mm` because `:` is invalid in a filename on Windows). Tell the user its path explicitly. This same file is then used as the source for creation (Step 5), so each draft only needs to be written once.
 
-**Spécificités Redmine — confirmer les rattachements avant création.** Ne jamais deviner : avant de générer le CSV ou le payload, faire confirmer interactivement (AskUserQuestion) :
+## Step 5 — Create
 
-- le **projet cible** (le `project_id` de la config peut ne pas être le bon : sous-projets fréquents) ;
-- la **tâche parente** éventuelle (ID d'une tâche existante, ou une tâche du même lot en cas de création en masse) ;
-- les **champs optionnels** pertinents pour cette instance : version cible, assigné, estimation, catégorie, champs personnalisés. Ne proposer que ceux que l'utilisateur ou la config mentionnent ; s'il en cite de nouveaux, proposer de les ajouter à `.claude/task-tracker.toml` pour les fois suivantes.
+Detailed commands per tracker: see `references/trackers.md`. Summary:
 
-Pour une création en masse, présenter un tableau récapitulatif (sujet, tracker, parent, projet) et le faire valider en bloc plutôt que tâche par tâche.
+- **GitHub**: `gh issue create` (prerequisite: `gh` authenticated). For a batch, use `--body-file` pointing to the body already drafted in the Step 4 file (extracted per task), rather than passing the body inline again or regenerating it.
+- **GitLab**: `glab issue create` if installed, otherwise the REST API with `GITLAB_TOKEN`. Same principle of reusing the file for the body in case of a batch.
+- **Redmine**: depending on the config's `method` — by default, generating a CSV for manual bulk import (the simplest, no authentication required), which is then the same file as the one from Step 4 (make its format `.csv` instead of `.md` from Step 4 onward if Redmine is the target); otherwise the Redmine MCP server if available in the session, or the REST API with `REDMINE_API_KEY`.
 
-Après création, rapporter l'URL (ou l'ID Redmine) à l'utilisateur. En cas d'échec (auth, droits), rapporter l'erreur exacte et fournir le corps rédigé pour création manuelle — ne pas perdre la rédaction.
+**Redmine specifics — confirm attachments before creation.** Never guess: before generating the CSV or the payload, confirm interactively (AskUserQuestion):
+
+- the **target project** (the config's `project_id` may not be the right one: sub-projects are common);
+- the possible **parent task** (ID of an existing task, or a task from the same batch in case of bulk creation);
+- the **optional fields** relevant to this instance: target version, assignee, estimate, category, custom fields. Only offer the ones the user or the config mentions; if new ones are cited, offer to add them to `.claude/task-tracker.toml` for next time.
+
+For bulk creation, the Step 4 summary table should also include the target project and the parent task so it can be validated at a glance.
+
+After creation, report the URL (or the Redmine ID) to the user. On failure (auth, permissions), report the exact error and provide the drafted body for manual creation — never lose the drafting work.

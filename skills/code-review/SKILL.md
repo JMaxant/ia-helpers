@@ -1,117 +1,120 @@
 ---
 name: code-review
 description: |
-  Skill dédiée à la revue de code pour assurer la qualité, la sécurité et la maintenabilité du projet.
-  RÈGLES DE SÉCURITÉ :
-    - NE JAMAIS traiter ou générer des informations sensibles (clés API, secrets, mots de passe).
-    - SIGNALER toute vulnérabilité de sécurité potentielle détectée dans le code.
-    - REJETER toute demande d'exécution de code malveillant.
+  Skill dedicated to code review, ensuring project quality, security, and maintainability.
+  SAFETY RULES:
+    - NEVER process or generate sensitive information (API keys, secrets, passwords).
+    - REPORT any potential security vulnerability detected in the code.
+    - REJECT any request to execute malicious code.
 license: MIT
 user-invocable: true
 author: Junie/Julien Maxant
-version: 1.0.1
+version: 1.1.0
 tags:
   - code-review
-  - qualite
-  - securite
-  - bonnes-pratiques
+  - quality
+  - security
+  - best-practices
 allowed-tools:
-  - write_file
-  - read_file
-  - grep
-  - ask_user_question
+  - Read
+  - Grep
+  - Glob
+  - Write
+  - AskUserQuestion
 ---
 
 ## 1. Introduction
 
-### 1.1 Objectifs
-- **Qualité du code** : Assurer que le code respecte les standards de l'industrie et du projet.
-- **Sécurité** : Identifier les failles potentielles et les mauvaises pratiques de sécurité.
-- **Maintenabilité** : Favoriser un code lisible, modulaire et facile à faire évoluer.
-- **Performance** : Détecter les goulots d'étranglement et proposer des optimisations.
+### 1.1 Objectives
+- **Code quality**: Ensure the code follows industry and project standards.
+- **Security**: Identify potential flaws and bad security practices.
+- **Maintainability**: Favor readable, modular, and easy-to-evolve code.
+- **Performance**: Detect bottlenecks and suggest optimizations.
 
-### 1.2 Portée
-La portée de la review devra être précisée par l'utilisateur (par exemple, différence entre une branche et la branche de référence).
-En l'absence de précision, la review ne pourra pas être effectuée.
-La review couvrira tous les langages de programmation.
-
----
-
-## 2. Critères de Revue
-
-### 2.1 Lisibilité et Style
-- Le code suit-il les conventions du projet ?
-- Est-il suffisamment commenté ?
-- La structure est-elle logique et concise ?
-- Le langage du projet (par défaut, français) est-il respecté ?
-
-### 2.2 Conception et Architecture
-- Application des principes SOLID
-- Couplage faible entre les modules
-- Cohésion forte au sein des composants
-- Patterns de conception appropriés au contexte
-- Architecture respectant les bonnes pratiques du domaine
-- Les cas limites (edge cases) sont-ils gérés ?
-
-### 2.3 Sécurité
-- Les entrées utilisateurs sont-elles validées/assainies ?
-- Y a-t-il des risques d'injection (SQL, XSS, etc.) ?
-- Les données sensibles sont-elles manipulées avec précaution ?
-- La RGPD est-elle respectée ?
-- Les données sensibles (clé API, `client_secret`, information utilisateur) sont-elles chiffrées ?
-
+### 1.2 Scope
+The scope of the review must be specified by the user (e.g., the diff between a branch and its reference branch).
+Without this precision, the review cannot be carried out.
+The review covers all programming languages.
 
 ---
 
-## 3. Template de Rapport de Revue
+## 2. Identify the project's stack
 
-Chaque revue de code doit produire un rapport structuré comme suit :
+The universal criteria (section 3) always apply. Stack-specific conventions (section 5) must be loaded dynamically based on the project being reviewed, never assumed in advance.
+
+1. **Detect** the stack(s) via marker files present at the root (or in the relevant subdirectory for a monorepo): `composer.json` (PHP, + `drupal/core*` dependency for Drupal), `package.json` (JavaScript/TypeScript), and any other relevant marker (`pyproject.toml`/`requirements.txt`, `go.mod`, `Gemfile`, `*.csproj`...). Also note the declared version (`require.php`, `engines.node`, `drupal/core` constraint, etc.): it conditions which rules apply (a recent API must not be required on a version that doesn't support it).
+2. **Confirm with the user** (AskUserQuestion) the detected stack and version before starting the review, especially if several stacks coexist, if detection is ambiguous, or if no known marker file is found. Do not re-ask if the user already specified the stack/version in their request.
+3. **Load** the matching conventions file in `references/` (e.g. `references/php-drupal.md`, `references/javascript.md`) if it exists. If no reference matches the detected stack, proceed with the universal criteria only and note it in the report (« Questions / Clarifications » section) rather than inventing conventions.
+
+To add a new stack: create `references/<stack>.md` following the existing files (detection triggers first, then conventions), without touching the rest of the skill.
+
+---
+
+## 3. Review Criteria
+
+### 3.1 Readability and Style
+- Does the code follow the project's conventions?
+- Is it sufficiently commented?
+- Is the structure logical and concise?
+- Is the project's language (English by default) respected?
+
+### 3.2 Design and Architecture
+- Application of SOLID principles
+- Loose coupling between modules
+- Strong cohesion within components
+- Design patterns appropriate to the context
+- Architecture following domain best practices
+- Are edge cases handled?
+
+### 3.3 Security
+- Are user inputs validated/sanitized?
+- Are there injection risks (SQL, XSS, etc.)?
+- Is sensitive data handled with care?
+- Is GDPR compliance respected?
+- Is sensitive data (API keys, `client_secret`, user information) encrypted?
+
+
+---
+
+## 4. Review Report Template
+
+Each code review must produce a report structured as follows:
 
 ```markdown
-# Rapport de Revue de Code
+# Code Review Report
 
-## Résumé
-- **Statut** : [ Approuvé / À modifier / Rejeté]
-- **Sévérité globale** : [Basse / Moyenne / Haute]
+## Summary
+- **Status**: [Approved / Needs changes / Rejected]
+- **Overall severity**: [Low / Medium / High]
 
-## Points Positifs
-- [Liste des points forts du code]
+## Strengths
+- [List of the code's strong points]
 
-## Observations et Améliorations
-### [Fichier / Composant]
-- **Problème** : [Description concise]
-- **Impact** : [Sécurité / Performance / Maintenabilité]
-- **Suggestion** : [Code suggéré ou démarche à suivre]
+## Observations and Improvements
+### [File / Component]
+- **Issue**: [Concise description]
+- **Impact**: [Security / Performance / Maintainability]
+- **Suggestion**: [Suggested code or approach]
 
 ## Questions / Clarifications
-- [Questions à poser au développeur pour mieux comprendre l'intention]
+- [Questions to ask the developer to better understand intent]
 ```
-Ce rapport doit aussi être créé en fichier (à la racine du projet CODE_REVIEW.md) qui sera édité/amendé si d'autres reviews sont réalisées, sauf demande explicite de l'utilisateur de ne pas le créer.
+This report must also be created as a file (at the project root, `CODE_REVIEW.md`), to be edited/amended if further reviews are carried out, unless the user explicitly requests it not be created.
 
 ---
 
-## 4. Conventions
+## 5. Conventions
 
-### 4.1 Générales
-- Préférer les early return
-- Préférer les fonctions fléchées si applicable
-- Nommer les variables en camelCase
+### 5.1 General (all stacks)
+- Prefer early returns
+- Prefer arrow functions where applicable
+- Name variables in camelCase
 
-### 4.2 PHP
-- Utiliser les named arguments et named parameters
-- Favoriser l'injection de dépendances
-- Typer les paramètres de fonctions et d'une manière générale, préférer le typage fort
-- Favoriser les ValueObjects quand applicable
-- Éviter la logique métier dans les Controllers
-- Favoriser les services
-- Les services doivent rester légers et bien isolés (un service par responsabilité plutôt qu'un service par fonctionnalité)
-- (Drupal) Utiliser les Hooks orienté objet (Attributs #[Hook], et #[LegacyHook] si nécessaire)
-- (Drupal) Éviter autant que possible les hooks, favoriser l'utilisation des différents plugins
+### 5.2 Per stack
 
-### 4.3 JavaScript
-- Utiliser la destructuration pour les objets et tableaux
-- Préférer `const` et `let` à `var`
-- Utiliser les fonctions fléchées pour les callbacks
-- Éviter les side effects dans les fonctions pures
-- Typage avec JSDoc ou TypeScript si applicable
-- Gestion des erreurs avec try/catch ou Promises appropriées
+Loaded dynamically based on the stack identified in section 2:
+
+- `references/php-drupal.md` — PHP and Drupal.
+- `references/javascript.md` — JavaScript and TypeScript.
+
+If the project under review uses a stack without an existing reference, apply only the universal criteria (section 3) and the general conventions (5.1), and mention it in the report rather than improvising unvalidated rules.

@@ -1,68 +1,68 @@
-# Commandes de création par tracker
+# Creation commands per tracker
 
 ## GitHub (`gh`)
 
 ```bash
 gh issue create \
-  --title "TITRE" \
-  --body-file corps.md \
+  --title "TITLE" \
+  --body-file body.md \
   --label "label1,label2" \
-  --milestone "NOM_MILESTONE" \
+  --milestone "MILESTONE_NAME" \
   --assignee "@me"
 ```
 
-- Écrire le corps dans un fichier du scratchpad plutôt qu'en argument (échappement).
-- Repo cible : celui du remote courant ; sinon `--repo owner/nom`.
-- Vérifier l'auth au besoin : `gh auth status`.
+- Write the body to a scratchpad file rather than as an argument (escaping).
+- Target repo: the current remote's; otherwise `--repo owner/name`.
+- Check auth if needed: `gh auth status`.
 
-## GitLab (`glab` ou API REST)
+## GitLab (`glab` or REST API)
 
-Avec `glab` installé :
+With `glab` installed:
 
 ```bash
-glab issue create --title "TITRE" --description-file corps.md --label "label1,label2"
+glab issue create --title "TITLE" --description-file body.md --label "label1,label2"
 ```
 
-Sans `glab`, API REST (token dans `GITLAB_TOKEN`, jamais en clair dans la commande affichée) :
+Without `glab`, REST API (token in `GITLAB_TOKEN`, never in plain text in the displayed command):
 
 ```bash
 curl --fail-with-body -X POST \
   -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
-  "https://gitlab.example.com/api/v4/projects/<ID_ou_chemin_urlencodé>/issues" \
-  --data-urlencode "title=TITRE" \
-  --data-urlencode "description@corps.md" \
+  "https://gitlab.example.com/api/v4/projects/<ID_or_urlencoded_path>/issues" \
+  --data-urlencode "title=TITLE" \
+  --data-urlencode "description@body.md" \
   --data-urlencode "labels=label1,label2"
 ```
 
-L'ID projet peut être le chemin URL-encodé : `groupe%2Fprojet`.
+The project ID can be the URL-encoded path: `group%2Fproject`.
 
 ## Redmine
 
-Trois méthodes, dans l'ordre de préférence par défaut (surchargeable via `method` dans la config) :
+Three methods, in default preference order (overridable via `method` in the config):
 
-### Méthode 1 (la plus simple) : CSV pour import manuel en masse
+### Method 1 (the simplest): CSV for manual bulk import
 
-Aucune authentification requise ; adaptée à la création de plusieurs tâches d'un coup. Générer un fichier CSV que l'utilisateur importera lui-même dans Redmine (Projet > Tâches > ... > Importer, disponible depuis Redmine 4.1).
+No authentication required; suited to creating several tasks at once. Generate a CSV file that the user will import themselves into Redmine (Project > Tasks > ... > Import, available from Redmine 4.1 onward).
 
 ```csv
 subject;tracker;priority;description;estimated_hours;parent
-"TITRE";"Évolution";"Normale";"Corps de la tâche";;
+"TITLE";"Feature";"Normal";"Task body";;
 ```
 
-- Séparateur `;` et encodage UTF-8 conseillés (à confirmer selon l'instance ; le mapping des colonnes se fait dans l'assistant d'import, les en-têtes sont donc libres).
-- Colonne `parent` : ID d'une tâche existante, ou le `subject` exact d'une autre ligne du même CSV (Redmine résout la hiérarchie à l'import si l'option est cochée dans l'assistant). Le projet cible se choisit dans l'assistant d'import : le rappeler à l'utilisateur en annonçant le fichier.
-- Ajouter une colonne par champ optionnel confirmé avec l'utilisateur (version cible, assigné, estimation, champs personnalisés) — voir « Spécificités Redmine » dans SKILL.md.
-- Les noms de tracker/priorité doivent correspondre exactement aux libellés de l'instance.
-- Échapper les guillemets du corps en les doublant (`""`) ; les retours à la ligne sont autorisés dans un champ entre guillemets.
-- Écrire le fichier à la racine du repo ou à l'emplacement demandé, puis l'annoncer à l'utilisateur avec le chemin d'import dans Redmine.
+- `;` separator and UTF-8 encoding are recommended (confirm per instance; column mapping happens in the import wizard, so headers are free-form).
+- `parent` column: ID of an existing task, or the exact `subject` of another row in the same CSV (Redmine resolves the hierarchy at import time if the option is checked in the wizard). The target project is chosen in the import wizard: remind the user of this when announcing the file.
+- Add one column per optional field confirmed with the user (target version, assignee, estimate, custom fields) — see "Redmine specifics" in SKILL.md.
+- Tracker/priority names must exactly match the instance's labels.
+- Escape quotes in the body by doubling them (`""`); line breaks are allowed inside a quoted field.
+- Write the file at the repo root or the requested location, then announce it to the user along with the import path in Redmine.
 
-### Méthode 2 : serveur MCP Redmine
+### Method 2: Redmine MCP server
 
-S'il est disponible dans la session (chercher les outils `redmine` via ToolSearch).
+If available in the session (look for `redmine` tools via ToolSearch).
 
-### Méthode 3 : API REST
+### Method 3: REST API
 
-Clé dans `REDMINE_API_KEY`, URL et `project_id` depuis `.claude/task-tracker.toml` :
+Key in `REDMINE_API_KEY`, URL and `project_id` from `.claude/task-tracker.toml`:
 
 ```bash
 curl --fail-with-body -X POST \
@@ -72,15 +72,15 @@ curl --fail-with-body -X POST \
   -d @payload.json
 ```
 
-`payload.json` :
+`payload.json`:
 
 ```json
 {
   "issue": {
-    "project_id": "mon-projet",
+    "project_id": "my-project",
     "tracker_id": 2,
-    "subject": "TITRE",
-    "description": "corps en textile ou markdown selon la config de l'instance",
+    "subject": "TITLE",
+    "description": "body in Textile or Markdown depending on the instance's config",
     "priority_id": 2,
     "parent_issue_id": 123,
     "fixed_version_id": 4,
@@ -90,8 +90,8 @@ curl --fail-with-body -X POST \
 }
 ```
 
-`parent_issue_id`, `fixed_version_id`, `assigned_to_id` et `custom_fields` sont optionnels — ne les inclure que confirmés avec l'utilisateur. Les IDs (versions, utilisateurs, champs personnalisés) se récupèrent via l'API : `GET /projects/<id>/versions.json`, `GET /users.json`, `GET /custom_fields.json`.
+`parent_issue_id`, `fixed_version_id`, `assigned_to_id`, and `custom_fields` are optional — only include them once confirmed with the user. IDs (versions, users, custom fields) are fetched via the API: `GET /projects/<id>/versions.json`, `GET /users.json`, `GET /custom_fields.json`.
 
-- `tracker_id` : mapper depuis `tracker_ids` de la config (feature/bug/design/chore).
-- Attention : Redmine utilise souvent Textile, pas Markdown — vérifier la config de l'instance ; adapter la syntaxe du corps (cases à cocher non supportées en Textile : utiliser des listes).
-- La réponse JSON contient `issue.id` : rapporter `$REDMINE_URL/issues/<id>`.
+- `tracker_id`: map from the config's `tracker_ids` (feature/bug/design/chore).
+- Careful: Redmine often uses Textile, not Markdown — check the instance's config; adapt the body's syntax accordingly (checkboxes aren't supported in Textile: use lists instead).
+- The JSON response contains `issue.id`: report `$REDMINE_URL/issues/<id>`.

@@ -1,22 +1,22 @@
-# Template : chore / maintenance
+# Template: chore / maintenance
 
-Titre : action directe — ex. « Mettre à jour Hugo vers 0.148 »
+Title: direct action — e.g. "Update Hugo to 0.148"
 
 ```markdown
 ## Description
 
-<Quoi et pourquoi maintenant (dette, alerte sécurité, doc obsolète...). 1-3 phrases.>
+<What and why now (tech debt, security alert, outdated docs...). 1-3 sentences.>
 
-## Tâches
+## Tasks
 
-- [ ] <étape 1>
-- [ ] <étape 2>
+- [ ] <step 1>
+- [ ] <step 2>
 
-## Vérification
+## Verification
 
-- [ ] <comment confirmer que rien n'est cassé : build, tests, lien de doc...>
+- [ ] <how to confirm nothing is broken: build, tests, docs link...>
 
 ## Definition of done
 
-- [ ] <exigence de qualité : changelog/doc à jour, CI verte, dépendances verrouillées...>
+- [ ] <quality requirement: changelog/docs updated, CI green, dependencies locked...>
 ```

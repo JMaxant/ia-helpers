@@ -1,30 +1,30 @@
-# Template : tâche de conception
+# Template: design task
 
-Titre : la question à trancher — ex. « Choisir la stratégie de taxonomie pour la veille »
+Title: the question to settle — e.g. "Choose the taxonomy strategy for the watch feature"
 
 ```markdown
-## Problématique
+## Problem
 
-<La question de conception à résoudre et pourquoi elle se pose maintenant.>
+<The design question to resolve and why it comes up now.>
 
-## Contraintes
+## Constraints
 
-- <contrainte technique, budget, compatibilité, délai...>
+- <technical constraint, budget, compatibility, deadline...>
 
-## Pistes envisagées (optionnel)
+## Options considered (optional)
 
-- <option A — avantages / inconvénients en une ligne>
-- <option B — idem>
+- <option A — pros / cons in one line>
+- <option B — same>
 
-## Livrable
+## Deliverable
 
-<Ce qui clôt la tâche : ADR, schéma, maquette, POC, décision documentée à tel endroit.>
+<What closes the task: ADR, diagram, mockup, POC, decision documented at a given location.>
 
-## Critères de décision
+## Decision criteria
 
-- [ ] <critère permettant de départager les options>
+- [ ] <criterion allowing the options to be arbitrated>
 
 ## Definition of done
 
-- [ ] <ce qui rend la tâche close : décision documentée, validée par X, issues de mise en œuvre créées...>
+- [ ] <what closes the task: decision documented, validated by X, implementation issues created...>
 ```

@@ -11,97 +11,107 @@ description: |
 license: MIT
 user-invocable: true
 author: Julien Maxant
-version: 1.0.1
+version: 1.1.0
 tags:
   - documentation
-  - optimisation
+  - optimization
   - templates
-  - automatisation
+  - automation
 allowed-tools:
-  - markdown
-  - read_file
-  - write_file
-  - ask_user_question
+  - Read
+  - Write
+  - AskUserQuestion
 ---
 
 ## 1. Introduction
 
-### 1.1 Objectifs
-- **Clarté** : Rendre la documentation compréhensible par tous les publics cibles.
-- **Maintenabilité** : Faciliter les mises à jour et les corrections grâce à une structure modulaire.
-- **Automatisation** : Réduire le temps passé à rédiger et mettre à jour la documentation.
-- **Standardisation** : Appliquer des normes de style et de format pour une cohérence globale.
+### 1.1 Objectives
+- **Clarity**: Make the documentation understandable by all target audiences.
+- **Maintainability**: Ease updates and corrections through a modular structure.
+- **Automation**: Reduce the time spent writing and updating documentation.
+- **Standardization**: Apply style and format standards for overall consistency.
 
-La documentation générée doit être claire et compréhensible pour tout les publics : elle doit servir de point d'entrée à la compréhension d'un projet ou d'une feature spécifique mais doit en revanche expliciter le fonctionnel et permettre un onboarding rapide. 
-Sauf consigne contraire explicite, elle n'a pas vocation à être une couverture technique exhaustive du périmètre à documenter.
+The generated documentation must be clear and understandable for all audiences: it should serve as an entry point for understanding a project or a specific feature, but it must primarily explain the functional side and enable fast onboarding.
+Unless explicitly instructed otherwise, it is not meant to be an exhaustive technical coverage of the scope being documented.
 
-### 1.2 Public Cible
-- Développeurs
-- Chef de projet
+### 1.2 Target Audience
+- Developers
+- Project managers
 
 ---
 
-## 2. Normes de Frontmatter
+## 2. Choosing the writing language
 
-**Chaque fichier de documentation doit commencer par un bloc frontmatter au format YAML** :
+Before writing anything, determine the language the documentation should be written in:
+
+1. If the user explicitly states a language (in the request, or in project conventions such as CLAUDE.md/CONTRIBUTING), use it without asking.
+2. Otherwise, check for an existing convention: the language already used in the project's existing documentation (`docs/`, `README.md`) or in `CLAUDE.md`/`CONTRIBUTING`.
+3. If no convention can be inferred, ask the user (AskUserQuestion) which language to write in before drafting any content. Do not default silently to a language.
+4. Keep a single language per document; do not mix languages within the same file unless explicitly requested.
+
+---
+
+## 3. Frontmatter Standards
+
+**Every documentation file must start with a YAML frontmatter block**:
 
 ```markdown
 ---
-title: Titre du document
-author: Nom de l'auteur ou équipe
+title: Document title
+author: Author or team name
 created: YYYY-MM-DD
 modified: YYYY-MM-DD
 version: x.x.x
-description: Brève description du contenu du document.
+description: Brief description of the document's content.
 tags:
   - tag1
   - tag2
 ---
 ```
 
-## 3. Bonnes Pratiques Générales
-### 3.1 Structure de la Documentation
+## 4. General Best Practices
+### 4.1 Documentation Structure
 
-**Hiérarchie claire :** Utiliser des titres et sous-titres explicites.
-**Modularité :** Séparer la documentation en fichiers ou sections thématiques.
-**Navigation intuitive :** Ajouter une table des matières pour les documents longs.
-**Source de vérité:** Questionner l'utilisateur pour s'assurer de la véracité du contenu.
-**Répertoires autorisés :** La documentation doit se trouver dans le répertoire docs à la racine git du projet, sauf consigne contraire explicite   .
+**Clear hierarchy:** Use explicit titles and subtitles.
+**Modularity:** Split documentation into thematic files or sections.
+**Intuitive navigation:** Add a table of contents for long documents.
+**Source of truth:** Question the user to confirm the accuracy of the content.
+**Allowed directories:** Documentation must live in the `docs` directory at the project's git root, unless explicitly instructed otherwise.
 
-### 3.2 Style et Ton
-**Langage simple :** Éviter le jargon technique non expliqué.
-**Exemples concrets :** Illustrer chaque concept avec des cas d'usage réels.
-**Voix active :** Privilégier des formulations directes.
-**L'utilisation d'emoji est proscrite**
+### 4.2 Style and Tone
+**Simple language:** Avoid unexplained technical jargon.
+**Concrete examples:** Illustrate each concept with real use cases.
+**Active voice:** Favor direct phrasing.
+**Emoji use is prohibited.**
 
-### 3.3 Accessibilité
-**Format Markdown** : Utiliser [CommonMark](https://commonmark.org/) ou GitHub Flavored Markdown pour une compatibilité maximale.
-**Images et diagrammes** : Ajouter des descriptions (alt text).
-**Langue de rédaction**: sauf consigne contraire explicite, écrire la documentation en français.
+### 4.3 Accessibility
+**Markdown format**: Use [CommonMark](https://commonmark.org/) or GitHub Flavored Markdown for maximum compatibility.
+**Images and diagrams**: Add descriptions (alt text).
+**Writing language**: as determined in section 2.
 
-## 4 Templates pré-définis
-### 4.1 Template pour un readme général
+## 5. Predefined Templates
+### 5.1 General README Template
 
-Ce template s'applique s'il s'agit de créer une documentation générale du projet 
+This template applies when creating general project documentation.
 ```markdown
 ---
 title: README
-author: [Nom de l'auteur]
+author: [Author name]
 created: [YYYY-MM-DD]
 modified: [YYYY-MM-DD]
 version: [x.x.x]
 template-version: 1.0.0
-description: Présentation générale du projet, son but et ses fonctionnalités principales.
+description: General overview of the project, its purpose, and its main features.
 tags:
   - introduction
   - overview
 ---
 
-# [Nom du Projet]
+# [Project Name]
 
 
-## Environnements
-|Environnement   | Url                         |
+## Environments
+|Environment     | Url                         |
 |----------------|-----------------------------|
 | Local          | http://localhost            |
 | Dev            | http://dev.example.com      |
@@ -109,78 +119,78 @@ tags:
 | Production     | https://example.com         |
 
 
-## Stack technique
+## Tech Stack
 
-| Techno                       | Version                       |
+| Tech                          | Version                       |
 |------------------------------|-------------------------------|
-| [Nom de la techno (ex: PHP)] | [Numéro de version (ex: 8.3)] |
+| [Tech name (e.g. PHP)]        | [Version number (e.g. 8.3)]   |
 
-## Prérequis
-- [Liste des dépendances ou outils nécessaires.]
+## Prerequisites
+- [List of required dependencies or tools.]
 
 ## Installation
 ### DDEV
 
-1. **Pré-requis :**
+1. **Prerequisites:**
     - [Docker](https://docs.docker.com/engine/install/)
     - [Ddev](https://ddev.readthedocs.io/en/latest/users/install/ddev-installation/)
-    - _Optionnel:_ GNUMake (`sudo apt install make`) ou installer Taskfile (voir ci-dessous)
-2. [Les différentes étapes de création du projet]
+    - _Optional:_ GNUMake (`sudo apt install make`) or install Taskfile (see below)
+2. [The various project setup steps]
 
-## Buildtools
-[Description des tâches déclarées dans la Makefile/Taskfile si applicable]
+## Build tools
+[Description of the tasks declared in the Makefile/Taskfile if applicable]
 
 ```
 
-### 4.2 Template pour un documentation technique/fonctionnelle
+### 5.2 Technical/Functional Documentation Template
 
 ```markdown
 ---
-title: [Titre du document]
-author: [Nom de l'auteur]
+title: [Document title]
+author: [Author name]
 created: [YYYY-MM-DD]
 modified: [YYYY-MM-DD]
 version: [x.x.x]
 template-version: 1.0.0
-description: [Description du contenu technique couvert]
+description: [Description of the technical content covered]
 tags:
-  - technique/fonctionnel
-  - [autre tag pertinent]
+  - technical/functional
+  - [other relevant tag]
 ---
 
-# [Titre du document]
+# [Document title]
 
 ## Introduction
-[Contexte et objectifs du document]
+[Context and objectives of the document]
 
-## Portée
-[Limites et périmètre couverts]
+## Scope
+[Boundaries and scope covered]
 
 ## Workflow
-[Description étape par étape du processus]
+[Step-by-step description of the process]
 
-## Concepts Clés
-- [Concept 1] : [Description]
-- [Concept 2] : [Description]
+## Key Concepts
+- [Concept 1]: [Description]
+- [Concept 2]: [Description]
 
-## Implémentation
-[Détails techniques, schémas, ou exemples de code génériques (optionnel pour les documents purements fonctionnels)]
+## Implementation
+[Technical details, diagrams, or generic code examples (optional for purely functional documents)]
 
-## Annexes
-[Informations complémentaires ou références]
+## Appendix
+[Additional information or references]
 ```
 
-### 4.3 Changelog
+### 5.3 Changelog
 
 ```markdown
 ---
 title: CHANGELOG
-author: [Nom]
+author: [Name]
 created: [YYYY-MM-DD]
 modified: [YYYY-MM-DD]
 version: [x.x.x]
 template-version: 1.0.0
-description: Historique des modifications du projet.
+description: History of the project's changes.
 tags:
   - changelog
   - updates
@@ -190,7 +200,7 @@ tags:
 
 ## [x.x.x] - YYYY-MM-DD
 ### Added
-- [Nouvelle fonctionnalité]
+- [New feature]
 ### Fixed
-- [Correction de bug]
+- [Bug fix]
 ```

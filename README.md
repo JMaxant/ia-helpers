@@ -2,7 +2,7 @@
 
 A collection of reusable helpers for working with AI agents: skills, agent definitions, rules, generic ignore files (`.aiignore`), and other assets meant to be shared across projects.
 
-Most of the assets are written in French, since they encode conventions for French-speaking projects.
+Assets are written in English.
 
 ## Contents
 
@@ -13,8 +13,9 @@ Agent skills, one directory per skill. Each skill is a `SKILL.md` with YAML fron
 - `new-task/` — Create a task (GitHub Issue, GitLab Issue, or Redmine ticket) from predefined templates, with user validation before creation. Reads its configuration from `.claude/task-tracker.toml` at the repository root and offers to create it when missing.
   - `templates/` — Task templates: `feature.md`, `bug.md`, `design.md`, `chore.md`.
   - `references/trackers.md` — Tracker-specific reference (GitHub, GitLab, Redmine).
-- `code-review/` — Code review focused on quality, security, and maintainability. Defines the review criteria (readability, design, security), a structured report template written to `CODE_REVIEW.md`, and the coding conventions expected by the project (general, PHP/Drupal, JavaScript).
-- `documentation/` — Writing and updating project documentation. Defines the frontmatter standard, general writing rules (structure, style, accessibility, French by default, no emoji), and templates for a general README, a technical/functional document, and a changelog.
+- `code-review/` — Code review focused on quality, security, and maintainability. Defines the universal review criteria (readability, design, security) and a structured report template written to `CODE_REVIEW.md`. Stack detection is dynamic: marker files (`composer.json`, `package.json`, ...) are used to infer the stack and version, confirmed interactively with the user (`AskUserQuestion`) before applying stack-specific conventions.
+  - `references/` — Stack-specific conventions, one file per stack, loaded only when detected: `php-drupal.md`, `javascript.md`. Add a new stack by dropping another file here (detection markers documented at the top of each file) without touching `SKILL.md`.
+- `documentation/` — Writing and updating project documentation. Defines the frontmatter standard, general writing rules (structure, style, accessibility, no emoji), and templates for a general README, a technical/functional document, and a changelog. The writing language is not assumed: it's inferred from explicit user instructions or existing project conventions, and asked interactively (`AskUserQuestion`) otherwise.
 
 ### `agents/`
 
