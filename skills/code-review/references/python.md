@@ -13,3 +13,9 @@
 - Avoid wildcard imports (`from module import *`).
 - For async code, keep I/O-bound work under `async`/`await` consistently; avoid blocking calls inside async functions.
 - Docstrings on public modules/classes/functions, in the style already used in the project (Google or NumPy) — do not introduce a third style.
+
+## Performance and scalability
+
+- Prefer generators and iterators over materializing full lists when the sequence can be large; the same applies to `.all()`-style ORM calls used only to iterate once.
+- Watch for ORM N+1: `select_related`/`prefetch_related` (Django), `selectinload`/`joinedload` (SQLAlchemy). A loop that touches a related attribute is the usual tell.
+- Blocking calls inside `async` functions are covered above; they are also the most common scalability defect in async Python, so report them under that angle too.
