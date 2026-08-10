@@ -26,6 +26,14 @@ Agent definitions derived from the skills above, for runtimes that use dedicated
 
 The `.md` agents and the matching skills carry the same content: pick whichever format the target runtime supports, not both.
 
+### `output-styles/`
+
+Claude Code output styles, one Markdown file per style. Each file is YAML frontmatter (`name`, `description`, and optionally `keep-coding-instructions`) followed by a body appended to the system prompt as `# Output Style: <name>`.
+
+- `terse.md` — Terse, evidence-first engineering voice: minimal prose, no claim without concrete evidence, assumptions surfaced rather than silently resolved. Sets `keep-coding-instructions: true`, which preserves Claude Code's built-in coding instructions (scope discipline, comment policy, security, UI testing) that an output style otherwise replaces; the style governs tone and rigor only, and defers code mechanics to the project's `CLAUDE.md`.
+
+An output style applies to the main conversation only. Subagents such as the `agents/` definitions above run their own system prompt and do not inherit it.
+
 ### Root files
 
 - `.editorconfig` — Shared editor settings (UTF-8, LF, 2-space indent, trailing whitespace preserved in Markdown to keep hard breaks).
@@ -49,6 +57,9 @@ ln -s "$PWD/skills/code-review" /path/to/project/.claude/skills/code-review
 
 # Agents
 ln -s "$PWD/agents/documentation.md" ~/.claude/agents/documentation.md
+
+# Output styles — Claude Code only, then select it with /config
+ln -s "$PWD/output-styles/terse.md" ~/.claude/output-styles/terse.md
 ```
 
 Symlinking keeps the installed copies in sync with this repository; copy instead when a project needs to pin or adapt its own version.
