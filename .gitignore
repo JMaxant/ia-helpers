@@ -1,2 +1,3 @@
 node_modules/
 Taskfile.yml
+/.claude/settings.local.json
