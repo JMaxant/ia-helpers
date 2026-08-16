@@ -51,6 +51,19 @@ The universal criteria below always apply. Stack-specific conventions must be lo
 - Is GDPR compliance respected?
 - Is sensitive data (API keys, `client_secret`, user information) encrypted?
 
+### Performance and scalability
+These criteria are relative to the workload the reviewed code actually serves. Establish that workload first (request-serving service, batch job, CLI, library, build tooling) and skip the questions that do not apply instead of reporting them as findings: a CLI parsing a config file has no reason to be stateless. If the workload is not obvious from the diff, ask the user (AskUserQuestion) or raise it in « Questions / Clarifications » rather than assuming a web service.
+
+- Is the algorithmic complexity acceptable for the data volumes the code will actually see, rather than for the volumes in the test fixtures?
+- Does anything grow without a bound: an accumulating collection, an unbounded retry or recursion, a cache with no eviction policy?
+- Are calls issued once per item inside a loop (database queries, HTTP requests, filesystem reads) where a single batched call would do?
+- Are potentially large datasets paginated, streamed, or processed in batches instead of being loaded into memory whole?
+- Do hot paths avoid blocking work (synchronous I/O, heavy computation) that would serialize concurrent work?
+- Where concurrency exists, is shared access safe, and are operations that may be retried idempotent?
+- If the code is expected to run as several instances, does it avoid relying on local in-memory state?
+- Are expensive repeated computations cached with an explicit invalidation story, rather than cached because a cache happens to be available?
+- Are calls to external dependencies bounded by timeouts, and are connections reused rather than reopened per call?
+
 ## Review report template
 
 Each code review must produce a report structured as follows:
@@ -68,7 +81,7 @@ Each code review must produce a report structured as follows:
 ## Observations and Improvements
 ### [File / Component]
 - **Issue**: [Concise description]
-- **Impact**: [Security / Performance / Maintainability]
+- **Impact**: [Security / Performance / Scalability / Maintainability]
 - **Suggestion**: [Suggested code or approach]
 
 ## Questions / Clarifications
@@ -95,6 +108,10 @@ This report must also be created as a file (at the project root, `CODE_REVIEW.md
 - (Drupal) Use object-oriented hooks (`#[Hook]` attribute, and `#[LegacyHook]` if needed) — available starting with Drupal 11.1; on earlier versions, fall back to classic procedural hooks without flagging it as a defect
 - (Drupal) Avoid hooks as much as possible, favor the various plugin systems
 - (Drupal) Check the targeted version before requiring a recent API (e.g. PHP attributes for plugins, available from Drupal 10.2/11 onward)
+- (Drupal) Load entities in a single `loadMultiple()` rather than calling `load()` inside a loop
+- (Drupal) Bound entity queries with `->range()`, and be explicit about `->accessCheck()`
+- (Drupal) Offload long-running work to the Queue API or the Batch API rather than running it inline in a request or directly inside `hook_cron`
+- (Drupal) Set render-array `#cache` keys, contexts, tags, and max-age deliberately: a missing cache tag serves stale content, an over-broad context destroys the hit rate
 
 ### JavaScript / TypeScript (if detected in the "Identify the stack" step)
 - Use destructuring for objects and arrays
@@ -103,6 +120,8 @@ This report must also be created as a file (at the project root, `CODE_REVIEW.md
 - Avoid side effects in pure functions
 - Type with JSDoc or TypeScript where applicable
 - Handle errors with appropriate try/catch or Promises
+- Avoid `await` inside a loop when the iterations are independent: use `Promise.all`/`Promise.allSettled`, with a concurrency bound if the input size is not controlled
+- Do not block the event loop with heavy synchronous computation; move it off the main thread (worker) or chunk it
 
 ### Vue.js 3 (if `vue` v3 or `.vue` files are detected)
 - Prefer the Composition API with `<script setup>` over the Options API for new components
@@ -115,6 +134,8 @@ This report must also be created as a file (at the project root, `CODE_REVIEW.md
 - Extract reusable reactive logic into composables (`useXxx` functions) rather than duplicating it or relying on mixins
 - Prefer Pinia over Vuex for shared/global state on new code
 - Use `defineModel` (Vue 3.4+) for single-prop two-way binding when the target version supports it, rather than manually wiring `modelValue`/`update:modelValue`
+- Virtualize long lists rather than rendering thousands of `v-for` nodes at once
+- Use `shallowRef`/`shallowReactive` for large payloads replaced wholesale instead of mutated, to avoid deep reactivity conversion on every assignment
 
 ### Python (if detected in the "Identify the stack" step)
 - Follow PEP 8; rely on the project's configured formatter/linter (`black`, `ruff`, `flake8`) rather than restating its rules manually if a config file is present
@@ -126,7 +147,9 @@ This report must also be created as a file (at the project root, `CODE_REVIEW.md
 - Catch specific exceptions; avoid bare `except:` and silently swallowed errors
 - Use context managers (`with`) for resources instead of manual acquire/release
 - Avoid wildcard imports
-- Keep async I/O consistently under `async`/`await`; avoid blocking calls inside async functions
+- Keep async I/O consistently under `async`/`await`; avoid blocking calls inside async functions — the most common scalability defect in async Python, report it under that angle too
+- Prefer generators and iterators over materializing full lists when the sequence can be large, including `.all()`-style ORM calls used only to iterate once
+- Watch for ORM N+1: `select_related`/`prefetch_related` (Django), `selectinload`/`joinedload` (SQLAlchemy); a loop touching a related attribute is the usual tell
 
 ### Go (if detected in the "Identify the stack" step)
 - Code must be `gofmt`/`goimports`-clean; do not flag pure formatting issues these tools already fix
@@ -140,6 +163,9 @@ This report must also be created as a file (at the project root, `CODE_REVIEW.md
 - Use table-driven tests (`t.Run` subtests) for functions with multiple input/output cases
 - Use `defer` for cleanup right after the resource is acquired
 - Avoid naked returns in functions longer than a few lines
+- Bound goroutine creation with a worker pool or a semaphore rather than spawning one per item over an input whose size you do not control
+- Every goroutine needs a termination path: check for leaks when the context is cancelled or when a channel is never drained
+- Preallocate slices and maps with a known capacity (`make([]T, 0, n)`) in hot loops instead of growing them by repeated `append`
 
 ### Any other stack with no convention listed above
 Apply only the universal criteria and the general conventions; note it in the report rather than improvising unvalidated rules.

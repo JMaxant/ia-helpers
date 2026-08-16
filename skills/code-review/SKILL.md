@@ -9,7 +9,7 @@ description: |
 license: MIT
 user-invocable: true
 author: Junie/Julien Maxant
-version: 1.2.0
+version: 1.3.0
 tags:
   - code-review
   - quality
@@ -73,6 +73,19 @@ To add a new stack: create `references/<stack>.md` following the existing files 
 - Is GDPR compliance respected?
 - Is sensitive data (API keys, `client_secret`, user information) encrypted?
 
+### 3.4 Performance and Scalability
+These criteria are relative to the workload the reviewed code actually serves. Establish that workload first (request-serving service, batch job, CLI, library, build tooling) and skip the questions that do not apply instead of reporting them as findings: a CLI parsing a config file has no reason to be stateless. If the workload is not obvious from the diff, ask the user (AskUserQuestion) or raise it in « Questions / Clarifications » rather than assuming a web service.
+
+- Is the algorithmic complexity acceptable for the data volumes the code will actually see, rather than for the volumes in the test fixtures?
+- Does anything grow without a bound: an accumulating collection, an unbounded retry or recursion, a cache with no eviction policy?
+- Are calls issued once per item inside a loop (database queries, HTTP requests, filesystem reads) where a single batched call would do?
+- Are potentially large datasets paginated, streamed, or processed in batches instead of being loaded into memory whole?
+- Do hot paths avoid blocking work (synchronous I/O, heavy computation) that would serialize concurrent work?
+- Where concurrency exists, is shared access safe, and are operations that may be retried idempotent?
+- If the code is expected to run as several instances, does it avoid relying on local in-memory state?
+- Are expensive repeated computations cached with an explicit invalidation story, rather than cached because a cache happens to be available?
+- Are calls to external dependencies bounded by timeouts, and are connections reused rather than reopened per call?
+
 ---
 
 ## 4. Review Report Template
@@ -92,7 +105,7 @@ Each code review must produce a report structured as follows:
 ## Observations and Improvements
 ### [File / Component]
 - **Issue**: [Concise description]
-- **Impact**: [Security / Performance / Maintainability]
+- **Impact**: [Security / Performance / Scalability / Maintainability]
 - **Suggestion**: [Suggested code or approach]
 
 ## Questions / Clarifications

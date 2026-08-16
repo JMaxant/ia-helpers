@@ -9,6 +9,11 @@
 - Type with JSDoc or TypeScript where applicable.
 - Handle errors with appropriate try/catch or Promises.
 
+## Performance and scalability
+
+- Avoid `await` inside a loop when the iterations are independent: use `Promise.all`/`Promise.allSettled`, with a concurrency bound if the input size is not controlled.
+- Do not block the event loop with heavy synchronous computation; move it off the main thread (worker) or chunk it.
+
 ## Vue.js 3
 
 **Detection triggers**: `vue` dependency at major version 3 in `package.json` (or `@vitejs/plugin-vue`/`vue-loader` present), and/or `.vue` files in the diff. Version read from the `vue` dependency constraint.
@@ -23,3 +28,5 @@
 - Extract reusable reactive logic into composables (`useXxx` functions) rather than duplicating it across components or relying on mixins.
 - For shared/global state, prefer Pinia over Vuex on new code.
 - Two-way binding on a single prop: use `defineModel` (Vue 3.4+) rather than manually wiring `modelValue`/`update:modelValue` when the target version supports it.
+- Virtualize long lists rather than rendering thousands of `v-for` nodes at once.
+- Use `shallowRef`/`shallowReactive` for large payloads that are replaced wholesale instead of mutated, to avoid deep reactivity conversion on every assignment.

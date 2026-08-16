@@ -13,3 +13,10 @@
 - Use table-driven tests (`[]struct{...}` + subtests via `t.Run`) for functions with multiple input/output cases.
 - Use `defer` for cleanup (closing files, unlocking mutexes) right after the resource is acquired.
 - Avoid naked returns in functions longer than a few lines — they hurt readability at the call site.
+
+## Performance and scalability
+
+- Bound goroutine creation with a worker pool or a semaphore rather than spawning one per item over an input whose size you do not control.
+- Every goroutine needs a termination path: check for leaks when the context is cancelled or when a channel is never drained.
+- Preallocate slices and maps with a known capacity (`make([]T, 0, n)`) in hot loops instead of growing them by repeated `append`.
+- `context` propagation is covered above; verify the cancellation actually reaches the blocking call, not just the function signature.
