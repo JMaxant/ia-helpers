@@ -12,6 +12,7 @@ Agent skills, one directory per skill. Each skill is a `SKILL.md` with YAML fron
 
 - `new-task/` — Create a task (GitHub Issue, GitLab Issue, or Redmine ticket) from predefined templates, with user validation before creation. Reads its configuration from `.claude/task-tracker.toml` at the repository root and offers to create it when missing.
   - `templates/` — Task templates: `feature.md`, `bug.md`, `design.md`, `chore.md`.
+  - Every task ends with a footer stating it was drafted by an AI agent and published through the account owner's token. On by default, configurable with `[disclosure]` in `.claude/task-tracker.toml`.
   - `references/trackers.md` — Tracker-specific reference (GitHub, GitLab, Redmine).
 - `code-review/` — Code review focused on quality, security, and maintainability. Defines the universal review criteria (readability, design, security) and a structured report template written to `CODE_REVIEW.md`. Stack detection is dynamic: marker files (`composer.json`, `package.json`, ...) are used to infer the stack and version, confirmed interactively with the user (`AskUserQuestion`) before applying stack-specific conventions.
   - `references/` — Stack-specific conventions, one file per stack, loaded only when detected: `php.md`, `drupal.md` (loaded on top of `php.md`), `javascript.md` (includes Vue.js 3), `python.md`, `golang.md`. Add a new stack by dropping another file here (detection markers documented at the top of each file) without touching `SKILL.md`.
@@ -133,6 +134,10 @@ The pre-commit hook (via `lefthook.yml`) runs the same Markdown lint on staged `
 - When a skill and an agent cover the same subject, keep both in sync.
 - One Markdown file per output style in `output-styles/`, named in kebab-case, with a `description` written for the `/config` picker. Set `keep-coding-instructions: true` unless the style deliberately drops Claude Code's software engineering instructions. Keep it to tone, rigor, and response format: project conventions belong in `CLAUDE.md`, and reusable workflows in a skill.
 - Run `task qa` (or `npm run lint:md`) before committing; the pre-commit hook already checks staged Markdown files, `task qa` covers everything.
+
+## AI-generated tracker items
+
+Trackers attribute API calls to the token owner, so a task created by an agent looks hand-written. `new-task` therefore discloses the agent's involvement in the body of every task it creates, shows that text in the draft the user approves, and lets a project turn it off or reword it. Commits keep their `Co-Authored-By` trailer.
 
 ## License
 

@@ -1,7 +1,7 @@
 {
   "name": "ia-helpers",
-  "version": "0.1.0",
-  "description": "Personal Claude Code helpers: code-review, documentation and new-task skills, matching agents, and the Terse output style.",
+  "version": "0.2.0",
+  "description": "Personal Claude Code helpers: code-review, documentation and new-task skills, plus the Terse output style.",
   "author": {
     "name": "Julien Maxant",
     "url": "https://github.com/JMaxant"

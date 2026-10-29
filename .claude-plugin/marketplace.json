@@ -4,12 +4,12 @@
     "name": "Julien Maxant",
     "url": "https://github.com/JMaxant"
   },
-  "description": "Marketplace for the ia-helpers plugin (personal Claude Code skills, agents and output style).",
+  "description": "Marketplace for the ia-helpers plugin (personal Claude Code skills and output style).",
   "plugins": [
     {
       "name": "ia-helpers",
       "source": "./",
-      "description": "Personal Claude Code helpers: code-review, documentation and new-task skills, matching agents, and the Terse output style."
+      "description": "Personal Claude Code helpers: code-review, documentation and new-task skills, plus the Terse output style."
     }
   ]
 }

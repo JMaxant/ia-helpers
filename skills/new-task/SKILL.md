@@ -1,5 +1,6 @@
 ---
 name: new-task
+version: 1.1.0
 description: Create a task (GitHub Issue, GitLab Issue, or Redmine ticket) from predefined templates (feature, bug, design, chore), with validation before creation. Use as soon as the user wants to create/draft an issue, a ticket, or a project-management task.
 ---
 
@@ -12,7 +13,7 @@ Draft a task from a template, get it validated, then create it in the project's 
 If `.claude/task-tracker.toml` doesn't exist at the repo root, or if the user explicitly asks for initialization, offer to create it by asking (AskUserQuestion):
 
 1. **Tracker**: github | gitlab | redmine (pre-select the one inferred from `git remote get-url origin` if there is one).
-2. **Defaults**: default labels, default milestone (suggest the project's existing values: `gh label list`, open milestones...).
+2. **Defaults**: default labels, default milestone (suggest the project's existing values: `gh label list`, open milestones...). The AI disclosure footer (see "Disclosure footer") is on by default and is not asked about; mention it in the summary of the file you show, and change it only if the user wants it off or reworded.
 3. **If Redmine**: instance URL, `project_id`, creation method (csv | mcp | rest — see `references/trackers.md`), and the `tracker_ids` mapping (ask for the IDs or fetch them via the API if a key is already available).
 
 Write the file, show it to the user, then continue with the requested task. If the user declines, continue without config (inference + one-off questions) without re-offering it during the session.
@@ -31,6 +32,10 @@ tracker = "github"          # github | gitlab | redmine
 [defaults]
 labels = []                  # default labels/tags applied
 milestone = ""               # default milestone (optional)
+
+[disclosure]
+enabled = true               # append the AI disclosure footer to every task (default: true)
+text = ""                    # custom wording; empty = the default wording, see "Disclosure footer"
 
 [redmine]
 url = "https://redmine.example.com"
@@ -60,6 +65,17 @@ Fill in the template with the information provided and the repo's context. Draft
 - Acceptance criteria: verifiable, one per line, checkboxes.
 - No emoji. Be concise.
 - Follow the project's conventions if documented (CLAUDE.md, CONTRIBUTING): title prefixes, required labels, links to a milestone.
+- Unless disabled in the config, end the body with the disclosure footer (next section).
+
+## Disclosure footer
+
+The tracker attributes every API call to the owner of the token, so a task drafted by an agent appears under the user's name with nothing to tell a reader that an agent was involved. The footer states it.
+
+- **Default**: enabled. `[disclosure].enabled = false` turns it off for the project.
+- **Wording, defined here once**: `Drafted by an AI agent ({agent}) and published through the account owner's token, after their review.` `{agent}` is the name of the agent running the skill (for example `Claude Code`). A non-empty `[disclosure].text` replaces the default wording and may use `{agent}`.
+- **Placement**: the last thing in the body, after a blank line and a `---` line. Title, labels and milestone are left untouched.
+- **Validation**: the footer is part of the draft shown in Step 4, for a single task and in the batch file alike, so the user approves the exact text that will be published. If the user asks to drop it for one task, drop it for that task only and leave the config alone unless they ask to change it.
+- **Out of scope**: git commit attribution (the `Co-Authored-By` trailer) and comments on existing tasks, which this skill does not create.
 
 ## Step 4 — Validate
 

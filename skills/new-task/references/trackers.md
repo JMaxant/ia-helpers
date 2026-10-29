@@ -1,5 +1,7 @@
 # Creation commands per tracker
 
+Every body below ends with the disclosure footer defined in SKILL.md ("Disclosure footer"), unless the config disables it. It is part of the body that was validated in Step 4: never add it or reword it at creation time.
+
 ## GitHub (`gh`)
 
 ```bash
@@ -13,6 +15,7 @@ gh issue create \
 
 - Write the body to a scratchpad file rather than as an argument (escaping).
 - Target repo: the current remote's; otherwise `--repo owner/name`.
+- The footer is plain Markdown at the end of the body file; nothing else to do.
 - Check auth if needed: `gh auth status`.
 
 ## GitLab (`glab` or REST API)
@@ -36,6 +39,8 @@ curl --fail-with-body -X POST \
 
 The project ID can be the URL-encoded path: `group%2Fproject`.
 
+The footer is plain Markdown at the end of the description file.
+
 ## Redmine
 
 Three methods, in default preference order (overridable via `method` in the config):
@@ -54,6 +59,7 @@ subject;tracker;priority;description;estimated_hours;parent
 - Add one column per optional field confirmed with the user (target version, assignee, estimate, custom fields) — see "Redmine specifics" in SKILL.md.
 - Tracker/priority names must exactly match the instance's labels.
 - Escape quotes in the body by doubling them (`""`); line breaks are allowed inside a quoted field.
+- The footer goes at the end of the `description` field, inside the quotes, like any other line of the body.
 - Write the file at the repo root or the requested location, then announce it to the user along with the import path in Redmine.
 
 ### Method 2: Redmine MCP server
@@ -93,5 +99,6 @@ curl --fail-with-body -X POST \
 `parent_issue_id`, `fixed_version_id`, `assigned_to_id`, and `custom_fields` are optional — only include them once confirmed with the user. IDs (versions, users, custom fields) are fetched via the API: `GET /projects/<id>/versions.json`, `GET /users.json`, `GET /custom_fields.json`.
 
 - `tracker_id`: map from the config's `tracker_ids` (feature/bug/design/chore).
+- The footer goes at the end of `description`. `---` is a horizontal rule in both Markdown and Textile, so it renders on either.
 - Careful: Redmine often uses Textile, not Markdown — check the instance's config; adapt the body's syntax accordingly (checkboxes aren't supported in Textile: use lists instead).
 - The JSON response contains `issue.id`: report `$REDMINE_URL/issues/<id>`.
