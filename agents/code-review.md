@@ -37,7 +37,7 @@ The universal criteria below always apply. Stack-specific conventions must be lo
 - Is the project's language (English by default) respected?
 
 ### Design and architecture
-- Application of SOLID principles
+- Application of SOLID principles, where the language and paradigm are object-oriented
 - Loose coupling between modules
 - Strong cohesion within components
 - Design patterns appropriate to the context
@@ -48,7 +48,7 @@ The universal criteria below always apply. Stack-specific conventions must be lo
 - Are user inputs validated/sanitized?
 - Are there injection risks (SQL, XSS, etc.)?
 - Is sensitive data handled with care?
-- Is GDPR compliance respected?
+- Is the applicable data-protection regulation (e.g. GDPR) respected?
 - Is sensitive data (API keys, `client_secret`, user information) encrypted?
 
 ### Performance and scalability
@@ -92,12 +92,14 @@ This report must also be created as a file (at the project root, `CODE_REVIEW.md
 
 ## Conventions
 
+Per-stack conventions take precedence over the general ones in case of conflict.
+
 ### General (all stacks)
 - Prefer early returns
-- Prefer arrow functions where applicable
-- Name variables in camelCase
 
-### PHP / Drupal (if detected in the "Identify the stack" step)
+Naming, function syntax, and formatting are stack-specific: they live in the per-stack sections below, never here.
+
+### PHP (if `composer.json` is detected in the "Identify the stack" step)
 - Use named arguments and named parameters
 - Favor dependency injection
 - Type function parameters and, more generally, prefer strong typing
@@ -105,18 +107,23 @@ This report must also be created as a file (at the project root, `CODE_REVIEW.md
 - Avoid business logic in Controllers
 - Favor services
 - Services should stay lightweight and well isolated (one service per responsibility rather than one service per feature)
-- (Drupal) Use object-oriented hooks (`#[Hook]` attribute, and `#[LegacyHook]` if needed) — available starting with Drupal 11.1; on earlier versions, fall back to classic procedural hooks without flagging it as a defect
-- (Drupal) Avoid hooks as much as possible, favor the various plugin systems
-- (Drupal) Check the targeted version before requiring a recent API (e.g. PHP attributes for plugins, available from Drupal 10.2/11 onward)
-- (Drupal) Load entities in a single `loadMultiple()` rather than calling `load()` inside a loop
-- (Drupal) Bound entity queries with `->range()`, and be explicit about `->accessCheck()`
-- (Drupal) Offload long-running work to the Queue API or the Batch API rather than running it inline in a request or directly inside `hook_cron`
-- (Drupal) Set render-array `#cache` keys, contexts, tags, and max-age deliberately: a missing cache tag serves stale content, an over-broad context destroys the hit rate
+- Naming: PascalCase for classes, lowerCamelCase for methods and object properties
+
+### Drupal (if a `drupal/core*` dependency is detected; in addition to PHP, and takes precedence over it on conflict)
+- Use object-oriented hooks (`#[Hook]` attribute, and `#[LegacyHook]` if needed) — available starting with Drupal 11.1; on earlier versions, fall back to classic procedural hooks without flagging it as a defect
+- Avoid hooks as much as possible, favor the various plugin systems
+- Check the targeted version before requiring a recent API (e.g. PHP attributes for plugins, available from Drupal 10.2/11 onward)
+- Naming: snake_case for procedural functions and hooks; Drupal core mixes camelCase and snake_case for local variables, so follow the surrounding file and flag neither
+- Load entities in a single `loadMultiple()` rather than calling `load()` inside a loop
+- Bound entity queries with `->range()`, and be explicit about `->accessCheck()`
+- Offload long-running work to the Queue API or the Batch API rather than running it inline in a request or directly inside `hook_cron`
+- Set render-array `#cache` keys, contexts, tags, and max-age deliberately: a missing cache tag serves stale content, an over-broad context destroys the hit rate
 
 ### JavaScript / TypeScript (if detected in the "Identify the stack" step)
 - Use destructuring for objects and arrays
 - Prefer `const` and `let` over `var`
 - Use arrow functions for callbacks
+- Name variables and functions in camelCase, classes and types in PascalCase
 - Avoid side effects in pure functions
 - Type with JSDoc or TypeScript where applicable
 - Handle errors with appropriate try/catch or Promises
@@ -138,6 +145,7 @@ This report must also be created as a file (at the project root, `CODE_REVIEW.md
 - Use `shallowRef`/`shallowReactive` for large payloads replaced wholesale instead of mutated, to avoid deep reactivity conversion on every assignment
 
 ### Python (if detected in the "Identify the stack" step)
+- Naming per PEP 8: snake_case for functions, variables and modules, PascalCase for classes, UPPER_SNAKE_CASE for constants; do not report snake_case as a violation
 - Follow PEP 8; rely on the project's configured formatter/linter (`black`, `ruff`, `flake8`) rather than restating its rules manually if a config file is present
 - Use type hints on function signatures and public APIs; prefer built-in generics (`list[str]`, `X | None`) over `typing.List`/`typing.Optional` on Python ≥ 3.9/3.10 targets — check the declared minimum version first
 - Favor `dataclasses` or Pydantic models over plain dicts/tuples for structured data crossing function boundaries
@@ -156,6 +164,7 @@ This report must also be created as a file (at the project root, `CODE_REVIEW.md
 - Idiomatic error handling (`if err != nil`) close to the call site; wrap with `fmt.Errorf("...: %w", err)` rather than swallowing or re-stringifying
 - Reserve `panic` for unrecoverable programmer errors, never expected/handleable conditions
 - Keep interfaces small and defined on the consumer side, not pre-emptively on the producer side
+- Naming: MixedCaps, never underscores (except in test function names and generated code); exported identifiers start with a capital letter, unexported ones with a lowercase letter; initialisms keep a single case (`ID`, `URL`, `HTTPServer`); do not report these as camelCase or PascalCase violations
 - Package names: short, lowercase, no underscores or mixedCaps
 - Receiver names: short and consistent across all methods of a type; be consistent about pointer vs. value receivers
 - Pass `context.Context` as the first parameter of I/O or cancellable functions; never store it in a struct field

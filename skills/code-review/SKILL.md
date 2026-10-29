@@ -9,7 +9,7 @@ description: |
 license: MIT
 user-invocable: true
 author: Junie/Julien Maxant
-version: 1.3.0
+version: 1.4.0
 tags:
   - code-review
   - quality
@@ -44,7 +44,7 @@ The universal criteria (section 3) always apply. Stack-specific conventions (sec
 
 1. **Detect** the stack(s) via marker files present at the root (or in the relevant subdirectory for a monorepo): `composer.json` (PHP, + `drupal/core*` dependency for Drupal), `package.json` (JavaScript/TypeScript, + `vue` v3 dependency or `.vue` files for Vue.js 3), `pyproject.toml`/`requirements.txt`/`setup.py` (Python), `go.mod` (Go), and any other relevant marker (`Gemfile`, `*.csproj`...). Also note the declared version (`require.php`, `engines.node`, `drupal/core` constraint, `python_requires`, the `go` directive, etc.): it conditions which rules apply (a recent API must not be required on a version that doesn't support it).
 2. **Confirm with the user** (AskUserQuestion) the detected stack and version before starting the review, especially if several stacks coexist, if detection is ambiguous, or if no known marker file is found. Do not re-ask if the user already specified the stack/version in their request.
-3. **Load** the matching conventions file in `references/` (e.g. `references/php-drupal.md`, `references/javascript.md`) if it exists. If no reference matches the detected stack, proceed with the universal criteria only and note it in the report (« Questions / Clarifications » section) rather than inventing conventions.
+3. **Load** the matching conventions file in `references/` (e.g. `references/php.md`, `references/javascript.md`) if it exists. A framework file (e.g. `references/drupal.md`) loads on top of its language file and takes precedence over it. If no reference matches the detected stack, proceed with the universal criteria only and note it in the report (« Questions / Clarifications » section) rather than inventing conventions.
 
 To add a new stack: create `references/<stack>.md` following the existing files (detection triggers first, then conventions), without touching the rest of the skill.
 
@@ -59,7 +59,7 @@ To add a new stack: create `references/<stack>.md` following the existing files 
 - Is the project's language (English by default) respected?
 
 ### 3.2 Design and Architecture
-- Application of SOLID principles
+- Application of SOLID principles, where the language and paradigm are object-oriented
 - Loose coupling between modules
 - Strong cohesion within components
 - Design patterns appropriate to the context
@@ -70,7 +70,7 @@ To add a new stack: create `references/<stack>.md` following the existing files 
 - Are user inputs validated/sanitized?
 - Are there injection risks (SQL, XSS, etc.)?
 - Is sensitive data handled with care?
-- Is GDPR compliance respected?
+- Is the applicable data-protection regulation (e.g. GDPR) respected?
 - Is sensitive data (API keys, `client_secret`, user information) encrypted?
 
 ### 3.4 Performance and Scalability
@@ -117,16 +117,19 @@ This report must also be created as a file (at the project root, `CODE_REVIEW.md
 
 ## 5. Conventions
 
+Per-stack conventions (5.2) take precedence over the general ones (5.1) in case of conflict.
+
 ### 5.1 General (all stacks)
 - Prefer early returns
-- Prefer arrow functions where applicable
-- Name variables in camelCase
+
+Naming, function syntax, and formatting are stack-specific: they live in `references/`, never here.
 
 ### 5.2 Per stack
 
 Loaded dynamically based on the stack identified in section 2:
 
-- `references/php-drupal.md` — PHP and Drupal.
+- `references/php.md` — PHP.
+- `references/drupal.md` — Drupal, in addition to PHP.
 - `references/javascript.md` — JavaScript, TypeScript, and Vue.js 3.
 - `references/python.md` — Python.
 - `references/golang.md` — Go.

@@ -5,6 +5,7 @@
 - Use destructuring for objects and arrays.
 - Prefer `const` and `let` over `var`.
 - Use arrow functions for callbacks.
+- Name variables and functions in camelCase, classes and types in PascalCase.
 - Avoid side effects in pure functions.
 - Type with JSDoc or TypeScript where applicable.
 - Handle errors with appropriate try/catch or Promises.

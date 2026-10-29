@@ -6,6 +6,7 @@
 - Idiomatic error handling: `if err != nil { return ... }` close to the call site; wrap with `fmt.Errorf("...: %w", err)` to preserve the chain rather than swallowing or re-stringifying it.
 - Reserve `panic` for truly unrecoverable programmer errors, never for expected/handleable error conditions.
 - Keep interfaces small (often a single method) and defined on the consumer side, not pre-emptively on the producer side.
+- Naming: MixedCaps, never underscores (except in test function names and generated code). Exported identifiers start with a capital letter, unexported ones with a lowercase letter; initialisms keep a single case (`ID`, `URL`, `HTTPServer`). Do not report these as camelCase or PascalCase violations.
 - Package names: short, lowercase, no underscores or mixedCaps.
 - Receiver names: short and consistent across all methods of the same type; be consistent about pointer vs. value receivers for a given type.
 - Pass `context.Context` as the first parameter of functions that do I/O or may be cancelled; do not store it in a struct field.
