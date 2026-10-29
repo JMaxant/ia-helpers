@@ -34,6 +34,8 @@ Claude Code output styles, one Markdown file per style. Each file is YAML frontm
 
 Styles are read from `~/.claude/output-styles/` for the user, and from every `.claude/output-styles/` between the working directory and the repository root for a project, the closest one winning on a name collision. Selecting a style with `/config` writes the `outputStyle` field to `.claude/settings.local.json`; because the system prompt is read once at session start, the change only applies after `/clear` or in a new session.
 
+Claude Code also ships a built-in `Concise` style (2.1.237 and later). It only shortens responses: result first, no preamble, narration or recap. `terse` is stricter on length (fragments, no praise, no restating the request) and adds behavior `Concise` does not have: separating verified facts from assumptions and naming the evidence, challenging weak plans once before complying, full sentences in durable artifacts (commits, PRs, documentation), and a language rule for replies and files. Pick `Concise` when responses are only too long; pick `terse` for the rigor. Only one style is active at a time, so they cannot be combined.
+
 An output style applies to the main conversation only. Subagents such as the `agents/` definitions above run their own system prompt and do not inherit it.
 
 ### Root files
