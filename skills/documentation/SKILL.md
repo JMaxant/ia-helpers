@@ -11,7 +11,7 @@ description: |
 license: MIT
 user-invocable: true
 author: Julien Maxant
-version: 1.1.0
+version: 1.2.0
 tags:
   - documentation
   - optimization
@@ -89,6 +89,13 @@ tags:
 **Images and diagrams**: Add descriptions (alt text).
 **Writing language**: as determined in section 2.
 
+### 4.4 Glossary
+**Mandatory** in the general README and in every technical/functional document; not in a changelog.
+**What goes in:** the acronyms and the technical, domain or project-specific terms a reader of the target audience (section 1.2) may not know. Judge against both audiences: a term obvious to a developer but opaque to a project manager belongs in the glossary. "OOP" needs no entry, whereas "DRP" or "failover" does. When in doubt, include it.
+**How:** one entry per term, in alphabetical order, with the expanded form for an acronym and a plain-language definition scoped to how the project uses the term. Do not copy a generic dictionary definition.
+**Nothing qualifies:** keep the section and state it in one line ("No scope-specific term."), so the reader knows the question was asked.
+**Existing documents:** when updating a document that has no glossary, add it; when a change introduces a term, add its entry and update `modified`.
+
 ## 5. Predefined Templates
 ### 5.1 General README Template
 
@@ -100,7 +107,7 @@ author: [Author name]
 created: [YYYY-MM-DD]
 modified: [YYYY-MM-DD]
 version: [x.x.x]
-template-version: 1.0.0
+template-version: 1.1.0
 description: General overview of the project, its purpose, and its main features.
 tags:
   - introduction
@@ -140,6 +147,9 @@ tags:
 ## Build tools
 [Description of the tasks declared in the Makefile/Taskfile if applicable]
 
+## Glossary
+- **[Term or acronym (expanded form)]**: [Plain-language definition, as the project uses it]
+
 ```
 
 ### 5.2 Technical/Functional Documentation Template
@@ -151,7 +161,7 @@ author: [Author name]
 created: [YYYY-MM-DD]
 modified: [YYYY-MM-DD]
 version: [x.x.x]
-template-version: 1.0.0
+template-version: 1.1.0
 description: [Description of the technical content covered]
 tags:
   - technical/functional
@@ -175,6 +185,9 @@ tags:
 
 ## Implementation
 [Technical details, diagrams, or generic code examples (optional for purely functional documents)]
+
+## Glossary
+- **[Term or acronym (expanded form)]**: [Plain-language definition, as the project uses it]
 
 ## Appendix
 [Additional information or references]
