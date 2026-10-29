@@ -9,5 +9,6 @@
   "homepage": "https://github.com/JMaxant/ia-helpers",
   "repository": "https://github.com/JMaxant/ia-helpers",
   "license": "MIT",
+  "agents": [],
   "keywords": ["code-review", "documentation", "tasks", "output-style"]
 }

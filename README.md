@@ -21,7 +21,7 @@ Agent skills, one directory per skill. Each skill is a `SKILL.md` with YAML fron
 
 Agent definitions derived from the skills above, for runtimes that use dedicated subagents rather than invocable skills.
 
-- `code-review.md` / `documentation.md` — Subagent definitions in Markdown with YAML frontmatter (`name`, `description`, `tools`), where the body is the agent's system prompt. Compatible with the Claude Code subagent format.
+- `code-review.md` / `documentation.md` — Subagent definitions (not part of the Claude Code plugin) in Markdown with YAML frontmatter (`name`, `description`, `tools`), where the body is the agent's system prompt. Compatible with the Claude Code subagent format.
 - `code-review.toml` / `documentation.toml` — TOML descriptors (`display_name`, `description`, `safety`, `skills`) that bind an agent to its skill, for runtimes reading agent registries such as `~/.vibe/agents/`.
 
 The `.md` agents and the matching skills carry the same content: pick whichever format the target runtime supports, not both.
@@ -40,17 +40,34 @@ An output style applies to the main conversation only. Subagents such as the `ag
 
 ### Root files
 
+- `.claude-plugin/plugin.json` and `marketplace.json` — Claude Code plugin manifest and marketplace catalog (see Usage below). The repository is both: the marketplace lists a single plugin whose source is the repository root.
 - `.editorconfig` — Shared editor settings (UTF-8, LF, 2-space indent, trailing whitespace preserved in Markdown to keep hard breaks).
 - `.markdownlint-cli2.jsonc` — Markdown lint rules (see Development below).
-- `lefthook.yml` — Git hooks config (pre-commit Markdown lint).
+- `lefthook.yml` — Git hooks config (pre-commit Markdown lint and plugin validation).
 - `Taskfile.dist.yml` — Template for local dev commands (see Development below).
 - `package.json` — npm scripts and dev dependencies backing the Taskfile and CI.
-- `.github/workflows/markdown-lint.yml` — CI job running the Markdown lint on push to `main` and on pull requests.
+- `.github/workflows/markdown-lint.yml` — CI jobs running the Markdown lint and `claude plugin validate --strict` on push to `main` and on pull requests.
 - `LICENSE` — MIT.
 
 ## Usage
 
-These assets are meant to be copied or symlinked into the configuration directory of the target tool. For Claude Code:
+Two ways to install, depending on the runtime.
+
+### Claude Code plugin
+
+```text
+/plugin install ia-helpers --marketplace JMaxant/ia-helpers
+```
+
+Or in two steps: `/plugin marketplace add JMaxant/ia-helpers`, then `/plugin install ia-helpers@ia-helpers`. Update with `claude plugin update ia-helpers@ia-helpers`; the installed version follows the `version` field of `.claude-plugin/plugin.json`.
+
+The plugin ships the three skills (`code-review`, `documentation`, `new-task`) and the `Terse` output style, which Claude Code lists as `ia-helpers:Terse`. It does not ship the `agents/` definitions, which duplicate the skills for runtimes without skill support: use the symlink recipe below for those. It is Claude Code only.
+
+Names are stable: renaming a skill or the output style breaks existing installations, so it is treated as a breaking change. Anthropic does not review plugins and `plugin update` pulls whatever the repository holds, so the content is kept to Markdown only, with no hooks, MCP servers or executables; the risk is limited to the instructions themselves. In particular, `new-task` drives `gh` with your token and `code-review` writes `CODE_REVIEW.md`.
+
+### Symlinks
+
+For any other runtime, or to pin and adapt your own copy, the assets can be copied or symlinked into the configuration directory of the target tool. For Claude Code:
 
 ```bash
 # Create the target directories first: ln -s fails on a missing parent, and
