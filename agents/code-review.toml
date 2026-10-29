@@ -1,4 +1,0 @@
-display_name = "Code Reviewer"
-description = "Expert code review agent, focused on quality, security, and maintainability."
-safety = "safe"
-skills = ['code-review']

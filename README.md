@@ -23,9 +23,8 @@ Agent skills, one directory per skill. Each skill is a `SKILL.md` with YAML fron
 Agent definitions derived from the skills above, for runtimes that use dedicated subagents rather than invocable skills.
 
 - `code-review.md` / `documentation.md` — Subagent definitions (not part of the Claude Code plugin) in Markdown with YAML frontmatter (`name`, `description`, `tools`), where the body is the agent's system prompt. Compatible with the Claude Code subagent format.
-- `code-review.toml` / `documentation.toml` — TOML descriptors (`display_name`, `description`, `safety`, `skills`) that bind an agent to its skill, for runtimes reading agent registries such as `~/.vibe/agents/`.
 
-The `.md` agents and the matching skills carry the same content: pick whichever format the target runtime supports, not both.
+The agents and the matching skills carry the same content: use one or the other, not both.
 
 ### `output-styles/`
 
