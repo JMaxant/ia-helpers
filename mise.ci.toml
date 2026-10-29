@@ -1,0 +1,2 @@
+[tools]
+"npm:@anthropic-ai/claude-code" = { version = "2.1.312", allow_builds = ["@anthropic-ai/claude-code"] }

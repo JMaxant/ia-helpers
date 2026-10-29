@@ -18,6 +18,5 @@
     "MD032": false,
     "MD031": false,
     "MD041": false
-  },
-  "ignores": ["node_modules"]
+  }
 }

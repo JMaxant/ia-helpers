@@ -1,4 +1,5 @@
 [tools]
+lefthook = "2.2.2"
+markdownlint-cli2 = "0.23.2"
 node = "24.22.2"
-"npm:@anthropic-ai/claude-code" = "2.1.312"
 task = "3.54.0"

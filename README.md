@@ -44,10 +44,12 @@ An output style applies to the main conversation only. Subagents such as the `ag
 - `.claude-plugin/plugin.json` and `marketplace.json` — Claude Code plugin manifest and marketplace catalog (see Usage below). The repository is both: the marketplace lists a single plugin whose source is the repository root.
 - `.editorconfig` — Shared editor settings (UTF-8, LF, 2-space indent, trailing whitespace preserved in Markdown to keep hard breaks).
 - `.markdownlint-cli2.jsonc` — Markdown lint rules (see Development below).
-- `lefthook.yml` — Git hooks config (pre-commit Markdown lint and plugin validation).
+- `lefthook.yml` — Git hooks config (pre-commit Markdown lint).
 - `Taskfile.dist.yml` — Template for local dev commands (see Development below).
-- `package.json` — npm scripts and dev dependencies backing the Taskfile and CI.
-- `.github/workflows/markdown-lint.yml` — CI jobs running the Markdown lint and `claude plugin validate --strict` on push to `main` and on pull requests.
+- `mise.toml` and `mise.lock` — Pinned dev tools ([mise](https://mise.jdx.dev)): Node.js, Task, lefthook, markdownlint-cli2.
+- `mise.ci.toml` and `mise.ci.lock` — Tools loaded in CI only (`MISE_ENV=ci`): the Claude Code CLI used by `claude plugin validate`.
+- `.mise/locks/` — Dependency locks that mise writes for npm-based tools, referenced by the lockfiles above.
+- `.github/workflows/quality.yml` — CI job running the Markdown lint and `claude plugin validate --strict` on push to `main` and on pull requests.
 - `LICENSE` — MIT.
 
 ## Usage
@@ -106,25 +108,30 @@ Whichever option applies, check where the agent actually looks for its skills an
 
 ## Development
 
-Requires Node.js and, optionally, [Task](https://taskfile.dev) (`task`) to run the commands below without typing the underlying `npm`/`npx` calls.
+Requires [mise](https://mise.jdx.dev), which installs every other tool at the version pinned in `mise.toml`. CI reads the same file through `jdx/mise-action`.
 
-Setup (once per clone): copy the Taskfile template, then run the setup task.
+Setup (once per clone):
 
 ```bash
+mise trust                          # mise only reads a config file you have trusted
+mise install                        # Node.js, Task, lefthook, markdownlint-cli2
 cp Taskfile.dist.yml Taskfile.yml   # git-ignored, safe to customize locally
-task setup                          # npm install + registers the pre-commit git hook
+task setup                          # registers the pre-commit git hook
 ```
 
-Without `task`, the same setup is `npm install` (its `prepare` script registers the git hook).
+`mise install` comes first: Task itself is installed by mise, so `task setup` cannot run it.
 
-Available tasks (`task --list`, or run the underlying npm script directly):
+Available tasks (`task --list`):
 
-| Task | npm script equivalent | What it does |
-| --- | --- | --- |
-| `task qa` | `npm run lint:md` | Runs every quality check on all files — what CI runs. |
-| `task qa:fix` | `npm run lint:md:fix` | Auto-fixes what can be (currently Markdown lint issues). |
+| Task | What it does |
+| --- | --- |
+| `task qa` | Runs the Markdown lint on all files. |
+| `task qa:fix` | Auto-fixes what can be (currently Markdown lint issues). |
+| `task qa:plugin` | Runs `claude plugin validate --strict` on the plugin. |
 
-The pre-commit hook (via `lefthook.yml`) runs the same Markdown lint on staged `*.md` files only, so most issues are caught before they ever reach CI.
+The pre-commit hook (via `lefthook.yml`) runs the Markdown lint on staged `*.md` files only, so most issues are caught before they ever reach CI.
+
+`task qa:plugin` needs the Claude Code CLI, which mise installs in CI only (`mise.ci.toml`), so that it never lands on a contributor's machine. CI runs it on every push and pull request; locally, run it only where `claude` is already on the `PATH`, such as the sandbox an agent works in.
 
 ## Contributing
 
@@ -133,7 +140,7 @@ The pre-commit hook (via `lefthook.yml`) runs the same Markdown lint on staged `
 - Keep supporting material in `templates/` (content to fill in) and `references/` (documentation loaded on demand) so the main `SKILL.md` stays short.
 - When a skill and an agent cover the same subject, keep both in sync.
 - One Markdown file per output style in `output-styles/`, named in kebab-case, with a `description` written for the `/config` picker. Set `keep-coding-instructions: true` unless the style deliberately drops Claude Code's software engineering instructions. Keep it to tone, rigor, and response format: project conventions belong in `CLAUDE.md`, and reusable workflows in a skill.
-- Run `task qa` (or `npm run lint:md`) before committing; the pre-commit hook already checks staged Markdown files, `task qa` covers everything.
+- Run `task qa` before committing; the pre-commit hook already checks staged Markdown files, `task qa` covers all of them. CI also runs `task qa:plugin`.
 
 ## AI-generated tracker items
 
