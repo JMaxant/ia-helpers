@@ -4,6 +4,7 @@
   "scripts": {
     "lint:md": "markdownlint-cli2 \"**/*.md\"",
     "lint:md:fix": "markdownlint-cli2 --fix \"**/*.md\"",
+    "lint:plugin": "claude plugin validate --strict .",
     "prepare": "lefthook install"
   },
   "devDependencies": {
