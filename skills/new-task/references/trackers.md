@@ -2,6 +2,16 @@
 
 Every body below ends with the disclosure footer defined in SKILL.md ("Disclosure footer"), unless the config disables it. It is part of the body that was validated in Step 4: never add it or reword it at creation time.
 
+## Reading what already exists
+
+Used by "Language" (last five tasks) and "Milestone" (open milestones) in SKILL.md.
+
+| Tracker | Last five tasks | Open milestones |
+| --- | --- | --- |
+| GitHub | `gh issue list --state all --limit 5 --json title,body` | `gh api repos/{owner}/{repo}/milestones --jq '.[].title'` (open ones by default) |
+| GitLab | `glab issue list --all --per-page 5` (or `GET /projects/<id>/issues?per_page=5`) | `glab api "projects/:id/milestones?state=active"` |
+| Redmine | `GET $REDMINE_URL/issues.json?project_id=<id>&limit=5&status_id=*&sort=id:desc` | `GET /projects/<id>/versions.json`, keep `status` = `open`; Redmine calls them target versions |
+
 ## GitHub (`gh`)
 
 ```bash

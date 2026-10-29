@@ -12,6 +12,7 @@ Agent skills, one directory per skill. Each skill is a `SKILL.md` with YAML fron
 
 - `new-task/` — Create a task (GitHub Issue, GitLab Issue, or Redmine ticket) from predefined templates, with user validation before creation. Reads its configuration from `.claude/task-tracker.toml` at the repository root and offers to create it when missing.
   - `templates/` — Task templates: `feature.md`, `bug.md`, `design.md`, `chore.md`.
+  - The language of a task comes from the config, then from the last tasks of the tracker, then from a question; never from the language of the request. A configured default milestone is checked against the tracker and dropped with a visible warning if it no longer exists.
   - Every task ends with a footer stating it was drafted by an AI agent and published through the account owner's token. On by default, configurable with `[disclosure]` in `.claude/task-tracker.toml`.
   - `references/trackers.md` — Tracker-specific reference (GitHub, GitLab, Redmine).
 - `code-review/` — Code review focused on quality, security, and maintainability. Defines the universal review criteria (readability, design, security) and a structured report template written to `CODE_REVIEW.md`. Stack detection is dynamic: marker files (`composer.json`, `package.json`, ...) are used to infer the stack and version, confirmed interactively with the user (`AskUserQuestion`) before applying stack-specific conventions.

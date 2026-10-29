@@ -1,6 +1,6 @@
 ---
 name: new-task
-version: 1.1.0
+version: 1.2.0
 description: Create a task (GitHub Issue, GitLab Issue, or Redmine ticket) from predefined templates (feature, bug, design, chore), with validation before creation. Use as soon as the user wants to create/draft an issue, a ticket, or a project-management task.
 ---
 
@@ -13,7 +13,7 @@ Draft a task from a template, get it validated, then create it in the project's 
 If `.claude/task-tracker.toml` doesn't exist at the repo root, or if the user explicitly asks for initialization, offer to create it by asking (AskUserQuestion):
 
 1. **Tracker**: github | gitlab | redmine (pre-select the one inferred from `git remote get-url origin` if there is one).
-2. **Defaults**: default labels, default milestone (suggest the project's existing values: `gh label list`, open milestones...). The AI disclosure footer (see "Disclosure footer") is on by default and is not asked about; mention it in the summary of the file you show, and change it only if the user wants it off or reworded.
+2. **Defaults**: default labels (suggest the project's existing ones: `gh label list`), and the default language (suggest the one inferred from the last tasks, see "Language"). Leave `milestone` empty unless the project keeps one milestone open over a long period (see "Milestone"). The AI disclosure footer (see "Disclosure footer") is on by default and is not asked about; mention it in the summary of the file you show, and change it only if the user wants it off or reworded.
 3. **If Redmine**: instance URL, `project_id`, creation method (csv | mcp | rest — see `references/trackers.md`), and the `tracker_ids` mapping (ask for the IDs or fetch them via the API if a key is already available).
 
 Write the file, show it to the user, then continue with the requested task. If the user declines, continue without config (inference + one-off questions) without re-offering it during the session.
@@ -31,7 +31,8 @@ tracker = "github"          # github | gitlab | redmine
 
 [defaults]
 labels = []                  # default labels/tags applied
-milestone = ""               # default milestone (optional)
+milestone = ""               # default milestone (optional, validated at use time, see "Milestone")
+language = ""                # language of titles and bodies, e.g. "fr"; empty = inferred, see "Language"
 
 [disclosure]
 enabled = true               # append the AI disclosure footer to every task (default: true)
@@ -64,8 +65,30 @@ Fill in the template with the information provided and the repo's context. Draft
 - Never leave a `<...>` placeholder in the result: ask for the missing information or remove the section if it's marked optional.
 - Acceptance criteria: verifiable, one per line, checkboxes.
 - No emoji. Be concise.
-- Follow the project's conventions if documented (CLAUDE.md, CONTRIBUTING): title prefixes, required labels, links to a milestone.
+- Follow the project's conventions if documented (CLAUDE.md, CONTRIBUTING): title prefixes, required labels, links to a milestone. They do not decide the language (see below).
+- Write in the language resolved below, headings of the template included.
 - Unless disabled in the config, end the body with the disclosure footer (next section).
+
+## Language
+
+Resolve the language of the title and body before drafting, in this order, and stop at the first step that gives an answer:
+
+1. **Config**: `defaults.language`, when non-empty (a name or an ISO code).
+2. **Existing tasks**: read the last five tasks of the tracker, open or closed (commands in `references/trackers.md`), and take the language most of their titles and bodies are written in. Leave out the disclosure footer when judging, since its default wording is English.
+3. **Ask once** (AskUserQuestion), then offer to save the answer as `defaults.language`. This covers an empty tracker and a split one.
+
+Do not infer the language from anything else: not the language of the user's request, not a rule such as "write the documentation in English" that is scoped to `docs/`, not the README or the commit messages. A task drafted in English in a tracker where every other task is in another language is the failure this section prevents.
+
+Translate the template's headings into the resolved language. Label, milestone and tracker names stay exactly as the tracker defines them. The disclosure footer is not translated: set `[disclosure].text` for a localized wording.
+
+## Milestone
+
+`defaults.milestone` drifts: a milestone is closed or renamed on the tracker and the config keeps pointing at it, which makes the creation command fail. Therefore:
+
+- **Off by default.** Step 0 leaves it empty unless the project keeps one milestone open over a long period. Per-release milestones belong to the task, not to the config.
+- **Validated while drafting**, before Step 4, against the tracker's open milestones (commands in `references/trackers.md`). A milestone found is shown in the draft. A milestone not found is dropped from the draft with a visible warning in Step 4 (`Default milestone "X" not found on the tracker: not applied`), and the creation proceeds without it. Never let the creation command fail on it, and never drop it silently.
+- **After a warning**, offer once to fix or clear `defaults.milestone` in the config.
+- **A milestone the user names for one task** that does not exist is not dropped: ask whether to pick another one or create the task without it.
 
 ## Disclosure footer
 
