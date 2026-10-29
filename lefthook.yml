@@ -3,6 +3,3 @@ pre-commit:
     markdownlint:
       glob: "*.md"
       run: npx markdownlint-cli2 {staged_files}
-    plugin-validate:
-      glob: "{.claude-plugin/*.json,skills/**,agents/*.md,output-styles/*.md}"
-      run: npm run lint:plugin

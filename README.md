@@ -44,10 +44,10 @@ An output style applies to the main conversation only. Subagents such as the `ag
 - `.claude-plugin/plugin.json` and `marketplace.json` — Claude Code plugin manifest and marketplace catalog (see Usage below). The repository is both: the marketplace lists a single plugin whose source is the repository root.
 - `.editorconfig` — Shared editor settings (UTF-8, LF, 2-space indent, trailing whitespace preserved in Markdown to keep hard breaks).
 - `.markdownlint-cli2.jsonc` — Markdown lint rules (see Development below).
-- `lefthook.yml` — Git hooks config (pre-commit Markdown lint and plugin validation).
+- `lefthook.yml` — Git hooks config (pre-commit Markdown lint).
 - `Taskfile.dist.yml` — Template for local dev commands (see Development below).
 - `package.json` — npm scripts and dev dependencies backing the Taskfile and CI.
-- `.github/workflows/markdown-lint.yml` — CI jobs running the Markdown lint and `claude plugin validate --strict` on push to `main` and on pull requests.
+- `.github/workflows/quality.yml` — CI job running the Markdown lint and `claude plugin validate --strict` on push to `main` and on pull requests.
 - `LICENSE` — MIT.
 
 ## Usage
@@ -121,10 +121,13 @@ Available tasks (`task --list`, or run the underlying npm script directly):
 
 | Task | npm script equivalent | What it does |
 | --- | --- | --- |
-| `task qa` | `npm run lint:md` | Runs every quality check on all files — what CI runs. |
+| `task qa` | `npm run lint:md` | Runs the Markdown lint on all files. |
 | `task qa:fix` | `npm run lint:md:fix` | Auto-fixes what can be (currently Markdown lint issues). |
+| — | `npm run lint:plugin` | Runs `claude plugin validate --strict` on the plugin (see below). |
 
 The pre-commit hook (via `lefthook.yml`) runs the same Markdown lint on staged `*.md` files only, so most issues are caught before they ever reach CI.
+
+Plugin validation needs the Claude Code CLI (`claude`). Run it inside a sandbox (a container, a devcontainer, an agent sandbox), never on the host: a `claude` installed on the host runs with your user's access to your home directory, credentials and other projects, and an agent sandbox limits what can leak out of it. CI runs it on every push to `main` and on pull requests, at the version pinned in `.github/workflows/quality.yml`, so it does not have to be run locally at all.
 
 ## Contributing
 
@@ -133,7 +136,7 @@ The pre-commit hook (via `lefthook.yml`) runs the same Markdown lint on staged `
 - Keep supporting material in `templates/` (content to fill in) and `references/` (documentation loaded on demand) so the main `SKILL.md` stays short.
 - When a skill and an agent cover the same subject, keep both in sync.
 - One Markdown file per output style in `output-styles/`, named in kebab-case, with a `description` written for the `/config` picker. Set `keep-coding-instructions: true` unless the style deliberately drops Claude Code's software engineering instructions. Keep it to tone, rigor, and response format: project conventions belong in `CLAUDE.md`, and reusable workflows in a skill.
-- Run `task qa` (or `npm run lint:md`) before committing; the pre-commit hook already checks staged Markdown files, `task qa` covers everything.
+- Run `task qa` (or `npm run lint:md`) before committing; the pre-commit hook already checks staged Markdown files, `task qa` covers all of them. Plugin validation runs in CI.
 
 ## AI-generated tracker items
 

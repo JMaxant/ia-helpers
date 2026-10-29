@@ -10,14 +10,13 @@ tasks:
   setup:
     desc: Set up the local dev environment (installs npm deps and the lefthook git hook).
     cmds:
-      - npm install
+      - npm ci
       - npx lefthook install
 
   qa:
-    desc: Run every quality check on all files (exactly what CI's quality job runs).
+    desc: Run every quality check on all .md files.
     cmds:
       - npm run lint:md
-      - npm run lint:plugin
 
   qa:fix:
     desc: Auto-fix what can be auto-fixed (currently Markdown lint issues), on all files.
