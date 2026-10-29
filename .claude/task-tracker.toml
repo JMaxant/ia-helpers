@@ -1,0 +1,5 @@
+tracker = "github"
+
+[defaults]
+labels = ["enhancement"]
+milestone = ""
