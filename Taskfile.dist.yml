@@ -10,15 +10,22 @@ tasks:
   setup:
     desc: Set up the local dev environment (installs npm deps and the lefthook git hook).
     cmds:
-      - npm install
-      - npx lefthook install
+      - lefthook install
 
   qa:
+    aliases:
+      - qa:md
     desc: Run every quality check on all files (exactly what CI's quality job runs).
     cmds:
-      - npm run lint:md
-      - npm run lint:plugin
+      - markdownlint-cli2 "**/*.md"
+      - claude plugin validate --strict .
+
+  qa:plugin:
+    desc: Validate the plugin (needs the claude CLI, installed in CI only).
+    cmd: claude plugin validate --strict .
+
 
   qa:fix:
     desc: Auto-fix what can be auto-fixed (currently Markdown lint issues), on all files.
-    cmd: npm run lint:md:fix
+    cmd: markdownlint-cli2 --fix "**/*.md"
+
